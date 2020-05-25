@@ -24,8 +24,8 @@ type
     base*: string
     host*: string
     schemes*: set[Scheme]
-    url*: proc (protocol: Scheme; host: string; base: string; route: string;
-              path: JsonNode; query: JsonNode): Uri
+    makeUrl*: proc (protocol: Scheme; host: string; base: string; route: string;
+                  path: JsonNode; query: JsonNode): Uri
 
   OpenApiRestCall_753573 = ref object of OpenApiRestCall
 proc hash(scheme: Scheme): Hash {.used.} =
@@ -121,8 +121,7 @@ proc url_GetEmojis_753779(protocol: Scheme; host: string; base: string; route: s
     result.path = base & route
 
 proc validate_GetEmojis_753778(path: JsonNode; query: JsonNode; header: JsonNode;
-                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Lists all the emojis available to use on GitHub.
   ## 
   var section: JsonNode
@@ -155,9 +154,9 @@ proc call*(call_753949: Call_GetEmojis_753777; path: JsonNode = nil;
   let scheme = call_753949.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_753949.url(scheme.get, call_753949.host, call_753949.base,
-                         call_753949.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_753949.makeUrl(scheme.get, call_753949.host, call_753949.base,
+                             call_753949.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_753949, uri, valid, _)
 
 proc call*(call_754020: Call_GetEmojis_753777; Accept: string = ""): Recallable =
@@ -172,7 +171,7 @@ proc call*(call_754020: Call_GetEmojis_753777; Accept: string = ""): Recallable 
 var getEmojis* = Call_GetEmojis_753777(name: "getEmojis", meth: HttpMethod.HttpGet,
                                     host: "api.github.com", route: "/emojis",
                                     validator: validate_GetEmojis_753778,
-                                    base: "/", url: url_GetEmojis_753779,
+                                    base: "/", makeUrl: url_GetEmojis_753779,
                                     schemes: {Scheme.Https})
 type
   Call_GetEvents_754061 = ref object of OpenApiRestCall_753573
@@ -188,8 +187,7 @@ proc url_GetEvents_754063(protocol: Scheme; host: string; base: string; route: s
     result.path = base & route
 
 proc validate_GetEvents_754062(path: JsonNode; query: JsonNode; header: JsonNode;
-                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List public events.
   ## 
   var section: JsonNode
@@ -222,9 +220,9 @@ proc call*(call_754065: Call_GetEvents_754061; path: JsonNode = nil;
   let scheme = call_754065.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754065.url(scheme.get, call_754065.host, call_754065.base,
-                         call_754065.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754065.makeUrl(scheme.get, call_754065.host, call_754065.base,
+                             call_754065.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754065, uri, valid, _)
 
 proc call*(call_754066: Call_GetEvents_754061; Accept: string = ""): Recallable =
@@ -239,7 +237,7 @@ proc call*(call_754066: Call_GetEvents_754061; Accept: string = ""): Recallable 
 var getEvents* = Call_GetEvents_754061(name: "getEvents", meth: HttpMethod.HttpGet,
                                     host: "api.github.com", route: "/events",
                                     validator: validate_GetEvents_754062,
-                                    base: "/", url: url_GetEvents_754063,
+                                    base: "/", makeUrl: url_GetEvents_754063,
                                     schemes: {Scheme.Https})
 type
   Call_GetFeeds_754068 = ref object of OpenApiRestCall_753573
@@ -255,8 +253,7 @@ proc url_GetFeeds_754070(protocol: Scheme; host: string; base: string; route: st
     result.path = base & route
 
 proc validate_GetFeeds_754069(path: JsonNode; query: JsonNode; header: JsonNode;
-                             formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                             formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List Feeds.
   ## GitHub provides several timeline resources in Atom format. The Feeds API
   ##  lists all the feeds available to the authenticating user.
@@ -295,9 +292,9 @@ proc call*(call_754072: Call_GetFeeds_754068; path: JsonNode = nil;
   let scheme = call_754072.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754072.url(scheme.get, call_754072.host, call_754072.base,
-                         call_754072.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754072.makeUrl(scheme.get, call_754072.host, call_754072.base,
+                             call_754072.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754072, uri, valid, _)
 
 proc call*(call_754073: Call_GetFeeds_754068; Accept: string = ""): Recallable =
@@ -315,7 +312,7 @@ proc call*(call_754073: Call_GetFeeds_754068; Accept: string = ""): Recallable =
 var getFeeds* = Call_GetFeeds_754068(name: "getFeeds", meth: HttpMethod.HttpGet,
                                   host: "api.github.com", route: "/feeds",
                                   validator: validate_GetFeeds_754069, base: "/",
-                                  url: url_GetFeeds_754070,
+                                  makeUrl: url_GetFeeds_754070,
                                   schemes: {Scheme.Https})
 type
   Call_PostGists_754084 = ref object of OpenApiRestCall_753573
@@ -331,8 +328,7 @@ proc url_PostGists_754086(protocol: Scheme; host: string; base: string; route: s
     result.path = base & route
 
 proc validate_PostGists_754085(path: JsonNode; query: JsonNode; header: JsonNode;
-                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a gist.
   ## 
   var section: JsonNode
@@ -369,9 +365,9 @@ proc call*(call_754098: Call_PostGists_754084; path: JsonNode = nil;
   let scheme = call_754098.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754098.url(scheme.get, call_754098.host, call_754098.base,
-                         call_754098.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754098.makeUrl(scheme.get, call_754098.host, call_754098.base,
+                             call_754098.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754098, uri, valid, _)
 
 proc call*(call_754099: Call_PostGists_754084; body: JsonNode; Accept: string = ""): Recallable =
@@ -390,7 +386,7 @@ proc call*(call_754099: Call_PostGists_754084; body: JsonNode; Accept: string = 
 var postGists* = Call_PostGists_754084(name: "postGists", meth: HttpMethod.HttpPost,
                                     host: "api.github.com", route: "/gists",
                                     validator: validate_PostGists_754085,
-                                    base: "/", url: url_PostGists_754086,
+                                    base: "/", makeUrl: url_PostGists_754086,
                                     schemes: {Scheme.Https})
 type
   Call_GetGists_754075 = ref object of OpenApiRestCall_753573
@@ -406,8 +402,7 @@ proc url_GetGists_754077(protocol: Scheme; host: string; base: string; route: st
     result.path = base & route
 
 proc validate_GetGists_754076(path: JsonNode; query: JsonNode; header: JsonNode;
-                             formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                             formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List the authenticated user's gists or if called anonymously, this will
   ## return all public gists.
   ## 
@@ -454,9 +449,9 @@ proc call*(call_754080: Call_GetGists_754075; path: JsonNode = nil;
   let scheme = call_754080.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754080.url(scheme.get, call_754080.host, call_754080.base,
-                         call_754080.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754080.makeUrl(scheme.get, call_754080.host, call_754080.base,
+                             call_754080.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754080, uri, valid, _)
 
 proc call*(call_754081: Call_GetGists_754075; since: string = ""; Accept: string = ""): Recallable =
@@ -479,7 +474,7 @@ proc call*(call_754081: Call_GetGists_754075; since: string = ""; Accept: string
 var getGists* = Call_GetGists_754075(name: "getGists", meth: HttpMethod.HttpGet,
                                   host: "api.github.com", route: "/gists",
                                   validator: validate_GetGists_754076, base: "/",
-                                  url: url_GetGists_754077,
+                                  makeUrl: url_GetGists_754077,
                                   schemes: {Scheme.Https})
 type
   Call_GetGistsPublic_754102 = ref object of OpenApiRestCall_753573
@@ -496,7 +491,7 @@ proc url_GetGistsPublic_754104(protocol: Scheme; host: string; base: string;
 
 proc validate_GetGistsPublic_754103(path: JsonNode; query: JsonNode;
                                    header: JsonNode; formData: JsonNode;
-                                   body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                   body: JsonNode; _: string = ""): JsonNode =
   ## List all public gists.
   ## 
   var section: JsonNode
@@ -539,9 +534,9 @@ proc call*(call_754107: Call_GetGistsPublic_754102; path: JsonNode = nil;
   let scheme = call_754107.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754107.url(scheme.get, call_754107.host, call_754107.base,
-                         call_754107.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754107.makeUrl(scheme.get, call_754107.host, call_754107.base,
+                             call_754107.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754107, uri, valid, _)
 
 proc call*(call_754108: Call_GetGistsPublic_754102; since: string = "";
@@ -562,8 +557,8 @@ proc call*(call_754108: Call_GetGistsPublic_754102; since: string = "";
 
 var getGistsPublic* = Call_GetGistsPublic_754102(name: "getGistsPublic",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/gists/public",
-    validator: validate_GetGistsPublic_754103, base: "/", url: url_GetGistsPublic_754104,
-    schemes: {Scheme.Https})
+    validator: validate_GetGistsPublic_754103, base: "/",
+    makeUrl: url_GetGistsPublic_754104, schemes: {Scheme.Https})
 type
   Call_GetGistsStarred_754111 = ref object of OpenApiRestCall_753573
 proc url_GetGistsStarred_754113(protocol: Scheme; host: string; base: string;
@@ -579,7 +574,7 @@ proc url_GetGistsStarred_754113(protocol: Scheme; host: string; base: string;
 
 proc validate_GetGistsStarred_754112(path: JsonNode; query: JsonNode;
                                     header: JsonNode; formData: JsonNode;
-                                    body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                    body: JsonNode; _: string = ""): JsonNode =
   ## List the authenticated user's starred gists.
   ## 
   var section: JsonNode
@@ -622,9 +617,9 @@ proc call*(call_754116: Call_GetGistsStarred_754111; path: JsonNode = nil;
   let scheme = call_754116.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754116.url(scheme.get, call_754116.host, call_754116.base,
-                         call_754116.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754116.makeUrl(scheme.get, call_754116.host, call_754116.base,
+                             call_754116.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754116, uri, valid, _)
 
 proc call*(call_754117: Call_GetGistsStarred_754111; since: string = "";
@@ -645,8 +640,8 @@ proc call*(call_754117: Call_GetGistsStarred_754111; since: string = "";
 
 var getGistsStarred* = Call_GetGistsStarred_754111(name: "getGistsStarred",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/gists/starred",
-    validator: validate_GetGistsStarred_754112, base: "/", url: url_GetGistsStarred_754113,
-    schemes: {Scheme.Https})
+    validator: validate_GetGistsStarred_754112, base: "/",
+    makeUrl: url_GetGistsStarred_754113, schemes: {Scheme.Https})
 type
   Call_GetGistsId_754120 = ref object of OpenApiRestCall_753573
 proc url_GetGistsId_754122(protocol: Scheme; host: string; base: string; route: string;
@@ -670,8 +665,7 @@ proc url_GetGistsId_754122(protocol: Scheme; host: string; base: string; route: 
     result.path = base & hydrated.get
 
 proc validate_GetGistsId_754121(path: JsonNode; query: JsonNode; header: JsonNode;
-                               formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                               formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a single gist.
   ## 
   var section: JsonNode
@@ -712,9 +706,9 @@ proc call*(call_754139: Call_GetGistsId_754120; path: JsonNode = nil;
   let scheme = call_754139.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754139.url(scheme.get, call_754139.host, call_754139.base,
-                         call_754139.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754139.makeUrl(scheme.get, call_754139.host, call_754139.base,
+                             call_754139.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754139, uri, valid, _)
 
 proc call*(call_754140: Call_GetGistsId_754120; id: int; Accept: string = ""): Recallable =
@@ -735,7 +729,7 @@ var getGistsId* = Call_GetGistsId_754120(name: "getGistsId",
                                       host: "api.github.com",
                                       route: "/gists/{id}",
                                       validator: validate_GetGistsId_754121,
-                                      base: "/", url: url_GetGistsId_754122,
+                                      base: "/", makeUrl: url_GetGistsId_754122,
                                       schemes: {Scheme.Https})
 type
   Call_PatchGistsId_754152 = ref object of OpenApiRestCall_753573
@@ -760,8 +754,7 @@ proc url_PatchGistsId_754154(protocol: Scheme; host: string; base: string;
     result.path = base & hydrated.get
 
 proc validate_PatchGistsId_754153(path: JsonNode; query: JsonNode; header: JsonNode;
-                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Edit a gist.
   ## 
   var section: JsonNode
@@ -806,9 +799,9 @@ proc call*(call_754158: Call_PatchGistsId_754152; path: JsonNode = nil;
   let scheme = call_754158.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754158.url(scheme.get, call_754158.host, call_754158.base,
-                         call_754158.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754158.makeUrl(scheme.get, call_754158.host, call_754158.base,
+                             call_754158.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754158, uri, valid, _)
 
 proc call*(call_754159: Call_PatchGistsId_754152; id: int; body: JsonNode;
@@ -831,7 +824,7 @@ proc call*(call_754159: Call_PatchGistsId_754152; id: int; body: JsonNode;
 
 var patchGistsId* = Call_PatchGistsId_754152(name: "patchGistsId",
     meth: HttpMethod.HttpPatch, host: "api.github.com", route: "/gists/{id}",
-    validator: validate_PatchGistsId_754153, base: "/", url: url_PatchGistsId_754154,
+    validator: validate_PatchGistsId_754153, base: "/", makeUrl: url_PatchGistsId_754154,
     schemes: {Scheme.Https})
 type
   Call_DeleteGistsId_754143 = ref object of OpenApiRestCall_753573
@@ -856,8 +849,7 @@ proc url_DeleteGistsId_754145(protocol: Scheme; host: string; base: string;
     result.path = base & hydrated.get
 
 proc validate_DeleteGistsId_754144(path: JsonNode; query: JsonNode; header: JsonNode;
-                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Delete a gist.
   ## 
   var section: JsonNode
@@ -898,9 +890,9 @@ proc call*(call_754148: Call_DeleteGistsId_754143; path: JsonNode = nil;
   let scheme = call_754148.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754148.url(scheme.get, call_754148.host, call_754148.base,
-                         call_754148.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754148.makeUrl(scheme.get, call_754148.host, call_754148.base,
+                             call_754148.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754148, uri, valid, _)
 
 proc call*(call_754149: Call_DeleteGistsId_754143; id: int; Accept: string = ""): Recallable =
@@ -918,7 +910,7 @@ proc call*(call_754149: Call_DeleteGistsId_754143; id: int; Accept: string = "")
 
 var deleteGistsId* = Call_DeleteGistsId_754143(name: "deleteGistsId",
     meth: HttpMethod.HttpDelete, host: "api.github.com", route: "/gists/{id}",
-    validator: validate_DeleteGistsId_754144, base: "/", url: url_DeleteGistsId_754145,
+    validator: validate_DeleteGistsId_754144, base: "/", makeUrl: url_DeleteGistsId_754145,
     schemes: {Scheme.Https})
 type
   Call_PostGistsIdComments_754172 = ref object of OpenApiRestCall_753573
@@ -945,8 +937,7 @@ proc url_PostGistsIdComments_754174(protocol: Scheme; host: string; base: string
 
 proc validate_PostGistsIdComments_754173(path: JsonNode; query: JsonNode;
                                         header: JsonNode; formData: JsonNode;
-                                        body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                        body: JsonNode; _: string = ""): JsonNode =
   ## Create a commen
   ## 
   var section: JsonNode
@@ -991,9 +982,9 @@ proc call*(call_754178: Call_PostGistsIdComments_754172; path: JsonNode = nil;
   let scheme = call_754178.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754178.url(scheme.get, call_754178.host, call_754178.base,
-                         call_754178.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754178.makeUrl(scheme.get, call_754178.host, call_754178.base,
+                             call_754178.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754178, uri, valid, _)
 
 proc call*(call_754179: Call_PostGistsIdComments_754172; id: int; body: JsonNode;
@@ -1017,7 +1008,7 @@ proc call*(call_754179: Call_PostGistsIdComments_754172; id: int; body: JsonNode
 var postGistsIdComments* = Call_PostGistsIdComments_754172(
     name: "postGistsIdComments", meth: HttpMethod.HttpPost, host: "api.github.com",
     route: "/gists/{id}/comments", validator: validate_PostGistsIdComments_754173,
-    base: "/", url: url_PostGistsIdComments_754174, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_PostGistsIdComments_754174, schemes: {Scheme.Https})
 type
   Call_GetGistsIdComments_754163 = ref object of OpenApiRestCall_753573
 proc url_GetGistsIdComments_754165(protocol: Scheme; host: string; base: string;
@@ -1043,8 +1034,7 @@ proc url_GetGistsIdComments_754165(protocol: Scheme; host: string; base: string;
 
 proc validate_GetGistsIdComments_754164(path: JsonNode; query: JsonNode;
                                        header: JsonNode; formData: JsonNode;
-                                       body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                       body: JsonNode; _: string = ""): JsonNode =
   ## List comments on a gist.
   ## 
   var section: JsonNode
@@ -1085,9 +1075,9 @@ proc call*(call_754168: Call_GetGistsIdComments_754163; path: JsonNode = nil;
   let scheme = call_754168.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754168.url(scheme.get, call_754168.host, call_754168.base,
-                         call_754168.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754168.makeUrl(scheme.get, call_754168.host, call_754168.base,
+                             call_754168.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754168, uri, valid, _)
 
 proc call*(call_754169: Call_GetGistsIdComments_754163; id: int; Accept: string = ""): Recallable =
@@ -1106,7 +1096,7 @@ proc call*(call_754169: Call_GetGistsIdComments_754163; id: int; Accept: string 
 var getGistsIdComments* = Call_GetGistsIdComments_754163(
     name: "getGistsIdComments", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/gists/{id}/comments", validator: validate_GetGistsIdComments_754164,
-    base: "/", url: url_GetGistsIdComments_754165, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetGistsIdComments_754165, schemes: {Scheme.Https})
 type
   Call_GetGistsIdCommentsCommentId_754183 = ref object of OpenApiRestCall_753573
 proc url_GetGistsIdCommentsCommentId_754185(protocol: Scheme; host: string;
@@ -1133,8 +1123,7 @@ proc url_GetGistsIdCommentsCommentId_754185(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetGistsIdCommentsCommentId_754184(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a single comment.
   ## 
   var section: JsonNode
@@ -1181,9 +1170,9 @@ proc call*(call_754189: Call_GetGistsIdCommentsCommentId_754183;
   let scheme = call_754189.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754189.url(scheme.get, call_754189.host, call_754189.base,
-                         call_754189.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754189.makeUrl(scheme.get, call_754189.host, call_754189.base,
+                             call_754189.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754189, uri, valid, _)
 
 proc call*(call_754190: Call_GetGistsIdCommentsCommentId_754183; id: int;
@@ -1207,7 +1196,7 @@ var getGistsIdCommentsCommentId* = Call_GetGistsIdCommentsCommentId_754183(
     name: "getGistsIdCommentsCommentId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/gists/{id}/comments/{commentId}",
     validator: validate_GetGistsIdCommentsCommentId_754184, base: "/",
-    url: url_GetGistsIdCommentsCommentId_754185, schemes: {Scheme.Https})
+    makeUrl: url_GetGistsIdCommentsCommentId_754185, schemes: {Scheme.Https})
 type
   Call_PatchGistsIdCommentsCommentId_754203 = ref object of OpenApiRestCall_753573
 proc url_PatchGistsIdCommentsCommentId_754205(protocol: Scheme; host: string;
@@ -1234,8 +1223,7 @@ proc url_PatchGistsIdCommentsCommentId_754205(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PatchGistsIdCommentsCommentId_754204(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Edit a comment.
   ## 
   var section: JsonNode
@@ -1286,9 +1274,9 @@ proc call*(call_754210: Call_PatchGistsIdCommentsCommentId_754203;
   let scheme = call_754210.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754210.url(scheme.get, call_754210.host, call_754210.base,
-                         call_754210.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754210.makeUrl(scheme.get, call_754210.host, call_754210.base,
+                             call_754210.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754210, uri, valid, _)
 
 proc call*(call_754211: Call_PatchGistsIdCommentsCommentId_754203; id: int;
@@ -1316,7 +1304,7 @@ var patchGistsIdCommentsCommentId* = Call_PatchGistsIdCommentsCommentId_754203(
     name: "patchGistsIdCommentsCommentId", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/gists/{id}/comments/{commentId}",
     validator: validate_PatchGistsIdCommentsCommentId_754204, base: "/",
-    url: url_PatchGistsIdCommentsCommentId_754205, schemes: {Scheme.Https})
+    makeUrl: url_PatchGistsIdCommentsCommentId_754205, schemes: {Scheme.Https})
 type
   Call_DeleteGistsIdCommentsCommentId_754193 = ref object of OpenApiRestCall_753573
 proc url_DeleteGistsIdCommentsCommentId_754195(protocol: Scheme; host: string;
@@ -1344,7 +1332,7 @@ proc url_DeleteGistsIdCommentsCommentId_754195(protocol: Scheme; host: string;
 
 proc validate_DeleteGistsIdCommentsCommentId_754194(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a comment.
   ## 
   var section: JsonNode
@@ -1391,9 +1379,9 @@ proc call*(call_754199: Call_DeleteGistsIdCommentsCommentId_754193;
   let scheme = call_754199.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754199.url(scheme.get, call_754199.host, call_754199.base,
-                         call_754199.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754199.makeUrl(scheme.get, call_754199.host, call_754199.base,
+                             call_754199.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754199, uri, valid, _)
 
 proc call*(call_754200: Call_DeleteGistsIdCommentsCommentId_754193; id: int;
@@ -1417,7 +1405,7 @@ var deleteGistsIdCommentsCommentId* = Call_DeleteGistsIdCommentsCommentId_754193
     name: "deleteGistsIdCommentsCommentId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/gists/{id}/comments/{commentId}",
     validator: validate_DeleteGistsIdCommentsCommentId_754194, base: "/",
-    url: url_DeleteGistsIdCommentsCommentId_754195, schemes: {Scheme.Https})
+    makeUrl: url_DeleteGistsIdCommentsCommentId_754195, schemes: {Scheme.Https})
 type
   Call_PostGistsIdForks_754215 = ref object of OpenApiRestCall_753573
 proc url_PostGistsIdForks_754217(protocol: Scheme; host: string; base: string;
@@ -1443,8 +1431,7 @@ proc url_PostGistsIdForks_754217(protocol: Scheme; host: string; base: string;
 
 proc validate_PostGistsIdForks_754216(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Fork a gist.
   ## 
   var section: JsonNode
@@ -1485,9 +1472,9 @@ proc call*(call_754220: Call_PostGistsIdForks_754215; path: JsonNode = nil;
   let scheme = call_754220.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754220.url(scheme.get, call_754220.host, call_754220.base,
-                         call_754220.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754220.makeUrl(scheme.get, call_754220.host, call_754220.base,
+                             call_754220.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754220, uri, valid, _)
 
 proc call*(call_754221: Call_PostGistsIdForks_754215; id: int; Accept: string = ""): Recallable =
@@ -1506,7 +1493,7 @@ proc call*(call_754221: Call_PostGistsIdForks_754215; id: int; Accept: string = 
 var postGistsIdForks* = Call_PostGistsIdForks_754215(name: "postGistsIdForks",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/gists/{id}/forks",
     validator: validate_PostGistsIdForks_754216, base: "/",
-    url: url_PostGistsIdForks_754217, schemes: {Scheme.Https})
+    makeUrl: url_PostGistsIdForks_754217, schemes: {Scheme.Https})
 type
   Call_PutGistsIdStar_754233 = ref object of OpenApiRestCall_753573
 proc url_PutGistsIdStar_754235(protocol: Scheme; host: string; base: string;
@@ -1532,7 +1519,7 @@ proc url_PutGistsIdStar_754235(protocol: Scheme; host: string; base: string;
 
 proc validate_PutGistsIdStar_754234(path: JsonNode; query: JsonNode;
                                    header: JsonNode; formData: JsonNode;
-                                   body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                   body: JsonNode; _: string = ""): JsonNode =
   ## Star a gist.
   ## 
   var section: JsonNode
@@ -1573,9 +1560,9 @@ proc call*(call_754238: Call_PutGistsIdStar_754233; path: JsonNode = nil;
   let scheme = call_754238.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754238.url(scheme.get, call_754238.host, call_754238.base,
-                         call_754238.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754238.makeUrl(scheme.get, call_754238.host, call_754238.base,
+                             call_754238.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754238, uri, valid, _)
 
 proc call*(call_754239: Call_PutGistsIdStar_754233; id: int; Accept: string = ""): Recallable =
@@ -1593,8 +1580,8 @@ proc call*(call_754239: Call_PutGistsIdStar_754233; id: int; Accept: string = ""
 
 var putGistsIdStar* = Call_PutGistsIdStar_754233(name: "putGistsIdStar",
     meth: HttpMethod.HttpPut, host: "api.github.com", route: "/gists/{id}/star",
-    validator: validate_PutGistsIdStar_754234, base: "/", url: url_PutGistsIdStar_754235,
-    schemes: {Scheme.Https})
+    validator: validate_PutGistsIdStar_754234, base: "/",
+    makeUrl: url_PutGistsIdStar_754235, schemes: {Scheme.Https})
 type
   Call_GetGistsIdStar_754224 = ref object of OpenApiRestCall_753573
 proc url_GetGistsIdStar_754226(protocol: Scheme; host: string; base: string;
@@ -1620,7 +1607,7 @@ proc url_GetGistsIdStar_754226(protocol: Scheme; host: string; base: string;
 
 proc validate_GetGistsIdStar_754225(path: JsonNode; query: JsonNode;
                                    header: JsonNode; formData: JsonNode;
-                                   body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                   body: JsonNode; _: string = ""): JsonNode =
   ## Check if a gist is starred.
   ## 
   var section: JsonNode
@@ -1661,9 +1648,9 @@ proc call*(call_754229: Call_GetGistsIdStar_754224; path: JsonNode = nil;
   let scheme = call_754229.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754229.url(scheme.get, call_754229.host, call_754229.base,
-                         call_754229.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754229.makeUrl(scheme.get, call_754229.host, call_754229.base,
+                             call_754229.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754229, uri, valid, _)
 
 proc call*(call_754230: Call_GetGistsIdStar_754224; id: int; Accept: string = ""): Recallable =
@@ -1681,8 +1668,8 @@ proc call*(call_754230: Call_GetGistsIdStar_754224; id: int; Accept: string = ""
 
 var getGistsIdStar* = Call_GetGistsIdStar_754224(name: "getGistsIdStar",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/gists/{id}/star",
-    validator: validate_GetGistsIdStar_754225, base: "/", url: url_GetGistsIdStar_754226,
-    schemes: {Scheme.Https})
+    validator: validate_GetGistsIdStar_754225, base: "/",
+    makeUrl: url_GetGistsIdStar_754226, schemes: {Scheme.Https})
 type
   Call_DeleteGistsIdStar_754242 = ref object of OpenApiRestCall_753573
 proc url_DeleteGistsIdStar_754244(protocol: Scheme; host: string; base: string;
@@ -1708,8 +1695,7 @@ proc url_DeleteGistsIdStar_754244(protocol: Scheme; host: string; base: string;
 
 proc validate_DeleteGistsIdStar_754243(path: JsonNode; query: JsonNode;
                                       header: JsonNode; formData: JsonNode;
-                                      body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                      body: JsonNode; _: string = ""): JsonNode =
   ## Unstar a gist.
   ## 
   var section: JsonNode
@@ -1750,9 +1736,9 @@ proc call*(call_754247: Call_DeleteGistsIdStar_754242; path: JsonNode = nil;
   let scheme = call_754247.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754247.url(scheme.get, call_754247.host, call_754247.base,
-                         call_754247.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754247.makeUrl(scheme.get, call_754247.host, call_754247.base,
+                             call_754247.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754247, uri, valid, _)
 
 proc call*(call_754248: Call_DeleteGistsIdStar_754242; id: int; Accept: string = ""): Recallable =
@@ -1771,7 +1757,7 @@ proc call*(call_754248: Call_DeleteGistsIdStar_754242; id: int; Accept: string =
 var deleteGistsIdStar* = Call_DeleteGistsIdStar_754242(name: "deleteGistsIdStar",
     meth: HttpMethod.HttpDelete, host: "api.github.com", route: "/gists/{id}/star",
     validator: validate_DeleteGistsIdStar_754243, base: "/",
-    url: url_DeleteGistsIdStar_754244, schemes: {Scheme.Https})
+    makeUrl: url_DeleteGistsIdStar_754244, schemes: {Scheme.Https})
 type
   Call_GetGitignoreTemplates_754251 = ref object of OpenApiRestCall_753573
 proc url_GetGitignoreTemplates_754253(protocol: Scheme; host: string; base: string;
@@ -1786,8 +1772,7 @@ proc url_GetGitignoreTemplates_754253(protocol: Scheme; host: string; base: stri
     result.path = base & route
 
 proc validate_GetGitignoreTemplates_754252(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Listing available templates.
   ## List all templates available to pass as an option when creating a repository.
   ## 
@@ -1824,9 +1809,9 @@ proc call*(call_754255: Call_GetGitignoreTemplates_754251; path: JsonNode = nil;
   let scheme = call_754255.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754255.url(scheme.get, call_754255.host, call_754255.base,
-                         call_754255.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754255.makeUrl(scheme.get, call_754255.host, call_754255.base,
+                             call_754255.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754255, uri, valid, _)
 
 proc call*(call_754256: Call_GetGitignoreTemplates_754251; Accept: string = ""): Recallable =
@@ -1843,7 +1828,7 @@ proc call*(call_754256: Call_GetGitignoreTemplates_754251; Accept: string = ""):
 var getGitignoreTemplates* = Call_GetGitignoreTemplates_754251(
     name: "getGitignoreTemplates", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/gitignore/templates", validator: validate_GetGitignoreTemplates_754252,
-    base: "/", url: url_GetGitignoreTemplates_754253, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetGitignoreTemplates_754253, schemes: {Scheme.Https})
 type
   Call_GetGitignoreTemplatesLanguage_754258 = ref object of OpenApiRestCall_753573
 proc url_GetGitignoreTemplatesLanguage_754260(protocol: Scheme; host: string;
@@ -1867,8 +1852,7 @@ proc url_GetGitignoreTemplatesLanguage_754260(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetGitignoreTemplatesLanguage_754259(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a single template.
   ## 
   var section: JsonNode
@@ -1909,9 +1893,9 @@ proc call*(call_754263: Call_GetGitignoreTemplatesLanguage_754258;
   let scheme = call_754263.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754263.url(scheme.get, call_754263.host, call_754263.base,
-                         call_754263.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754263.makeUrl(scheme.get, call_754263.host, call_754263.base,
+                             call_754263.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754263, uri, valid, _)
 
 proc call*(call_754264: Call_GetGitignoreTemplatesLanguage_754258;
@@ -1931,7 +1915,7 @@ var getGitignoreTemplatesLanguage* = Call_GetGitignoreTemplatesLanguage_754258(
     name: "getGitignoreTemplatesLanguage", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/gitignore/templates/{language}",
     validator: validate_GetGitignoreTemplatesLanguage_754259, base: "/",
-    url: url_GetGitignoreTemplatesLanguage_754260, schemes: {Scheme.Https})
+    makeUrl: url_GetGitignoreTemplatesLanguage_754260, schemes: {Scheme.Https})
 type
   Call_GetIssues_754267 = ref object of OpenApiRestCall_753573
 proc url_GetIssues_754269(protocol: Scheme; host: string; base: string; route: string;
@@ -1946,8 +1930,7 @@ proc url_GetIssues_754269(protocol: Scheme; host: string; base: string; route: s
     result.path = base & route
 
 proc validate_GetIssues_754268(path: JsonNode; query: JsonNode; header: JsonNode;
-                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List issues.
   ## List all issues across all the authenticated user's visible repositories.
   ## 
@@ -2028,9 +2011,9 @@ proc call*(call_754290: Call_GetIssues_754267; path: JsonNode = nil;
   let scheme = call_754290.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754290.url(scheme.get, call_754290.host, call_754290.base,
-                         call_754290.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754290.makeUrl(scheme.get, call_754290.host, call_754290.base,
+                             call_754290.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754290, uri, valid, _)
 
 proc call*(call_754291: Call_GetIssues_754267; labels: string;
@@ -2069,7 +2052,7 @@ proc call*(call_754291: Call_GetIssues_754267; labels: string;
 var getIssues* = Call_GetIssues_754267(name: "getIssues", meth: HttpMethod.HttpGet,
                                     host: "api.github.com", route: "/issues",
                                     validator: validate_GetIssues_754268,
-                                    base: "/", url: url_GetIssues_754269,
+                                    base: "/", makeUrl: url_GetIssues_754269,
                                     schemes: {Scheme.Https})
 type
   Call_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_754294 = ref object of OpenApiRestCall_753573
@@ -2105,7 +2088,7 @@ proc url_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_754296(
 
 proc validate_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_754295(
     path: JsonNode; query: JsonNode; header: JsonNode; formData: JsonNode;
-    body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+    body: JsonNode; _: string = ""): JsonNode =
   ## Find issues by state and keyword.
   ## 
   var section: JsonNode
@@ -2167,9 +2150,9 @@ proc call*(call_754302: Call_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_75
   let scheme = call_754302.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754302.url(scheme.get, call_754302.host, call_754302.base,
-                         call_754302.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754302.makeUrl(scheme.get, call_754302.host, call_754302.base,
+                             call_754302.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754302, uri, valid, _)
 
 proc call*(call_754303: Call_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_754294;
@@ -2199,7 +2182,7 @@ var getLegacyIssuesSearchOwnerRepositoryStateKeyword* = Call_GetLegacyIssuesSear
     meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/legacy/issues/search/{owner}/{repository}/{state}/{keyword}",
     validator: validate_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_754295,
-    base: "/", url: url_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_754296,
+    base: "/", makeUrl: url_GetLegacyIssuesSearchOwnerRepositoryStateKeyword_754296,
     schemes: {Scheme.Https})
 type
   Call_GetLegacyReposSearchKeyword_754306 = ref object of OpenApiRestCall_753573
@@ -2224,8 +2207,7 @@ proc url_GetLegacyReposSearchKeyword_754308(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetLegacyReposSearchKeyword_754307(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Find repositories by keyword. Note, this legacy method does not follow the v3 pagination pattern. This method returns up to 100 results per page and pages can be fetched using the start_page parameter.
   ## 
   var section: JsonNode
@@ -2296,9 +2278,9 @@ proc call*(call_754315: Call_GetLegacyReposSearchKeyword_754306;
   let scheme = call_754315.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754315.url(scheme.get, call_754315.host, call_754315.base,
-                         call_754315.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754315.makeUrl(scheme.get, call_754315.host, call_754315.base,
+                             call_754315.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754315, uri, valid, _)
 
 proc call*(call_754316: Call_GetLegacyReposSearchKeyword_754306; keyword: string;
@@ -2333,7 +2315,7 @@ var getLegacyReposSearchKeyword* = Call_GetLegacyReposSearchKeyword_754306(
     name: "getLegacyReposSearchKeyword", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/legacy/repos/search/{keyword}",
     validator: validate_GetLegacyReposSearchKeyword_754307, base: "/",
-    url: url_GetLegacyReposSearchKeyword_754308, schemes: {Scheme.Https})
+    makeUrl: url_GetLegacyReposSearchKeyword_754308, schemes: {Scheme.Https})
 type
   Call_GetLegacyUserEmailEmail_754320 = ref object of OpenApiRestCall_753573
 proc url_GetLegacyUserEmailEmail_754322(protocol: Scheme; host: string; base: string;
@@ -2358,8 +2340,7 @@ proc url_GetLegacyUserEmailEmail_754322(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetLegacyUserEmailEmail_754321(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## This API call is added for compatibility reasons only.
   ## 
   var section: JsonNode
@@ -2401,9 +2382,9 @@ proc call*(call_754325: Call_GetLegacyUserEmailEmail_754320; path: JsonNode = ni
   let scheme = call_754325.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754325.url(scheme.get, call_754325.host, call_754325.base,
-                         call_754325.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754325.makeUrl(scheme.get, call_754325.host, call_754325.base,
+                             call_754325.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754325, uri, valid, _)
 
 proc call*(call_754326: Call_GetLegacyUserEmailEmail_754320; email: string;
@@ -2424,7 +2405,7 @@ var getLegacyUserEmailEmail* = Call_GetLegacyUserEmailEmail_754320(
     name: "getLegacyUserEmailEmail", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/legacy/user/email/{email}",
     validator: validate_GetLegacyUserEmailEmail_754321, base: "/",
-    url: url_GetLegacyUserEmailEmail_754322, schemes: {Scheme.Https})
+    makeUrl: url_GetLegacyUserEmailEmail_754322, schemes: {Scheme.Https})
 type
   Call_GetLegacyUserSearchKeyword_754329 = ref object of OpenApiRestCall_753573
 proc url_GetLegacyUserSearchKeyword_754331(protocol: Scheme; host: string;
@@ -2448,8 +2429,7 @@ proc url_GetLegacyUserSearchKeyword_754331(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetLegacyUserSearchKeyword_754330(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Find users by keyword.
   ## 
   var section: JsonNode
@@ -2513,9 +2493,9 @@ proc call*(call_754337: Call_GetLegacyUserSearchKeyword_754329;
   let scheme = call_754337.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754337.url(scheme.get, call_754337.host, call_754337.base,
-                         call_754337.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754337.makeUrl(scheme.get, call_754337.host, call_754337.base,
+                             call_754337.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754337, uri, valid, _)
 
 proc call*(call_754338: Call_GetLegacyUserSearchKeyword_754329; keyword: string;
@@ -2547,7 +2527,7 @@ var getLegacyUserSearchKeyword* = Call_GetLegacyUserSearchKeyword_754329(
     name: "getLegacyUserSearchKeyword", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/legacy/user/search/{keyword}",
     validator: validate_GetLegacyUserSearchKeyword_754330, base: "/",
-    url: url_GetLegacyUserSearchKeyword_754331, schemes: {Scheme.Https})
+    makeUrl: url_GetLegacyUserSearchKeyword_754331, schemes: {Scheme.Https})
 type
   Call_PostMarkdown_754342 = ref object of OpenApiRestCall_753573
 proc url_PostMarkdown_754344(protocol: Scheme; host: string; base: string;
@@ -2562,8 +2542,7 @@ proc url_PostMarkdown_754344(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_PostMarkdown_754343(path: JsonNode; query: JsonNode; header: JsonNode;
-                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Render an arbitrary Markdown document
   ## 
   var section: JsonNode
@@ -2600,9 +2579,9 @@ proc call*(call_754347: Call_PostMarkdown_754342; path: JsonNode = nil;
   let scheme = call_754347.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754347.url(scheme.get, call_754347.host, call_754347.base,
-                         call_754347.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754347.makeUrl(scheme.get, call_754347.host, call_754347.base,
+                             call_754347.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754347, uri, valid, _)
 
 proc call*(call_754348: Call_PostMarkdown_754342; body: JsonNode; Accept: string = ""): Recallable =
@@ -2620,7 +2599,7 @@ proc call*(call_754348: Call_PostMarkdown_754342; body: JsonNode; Accept: string
 
 var postMarkdown* = Call_PostMarkdown_754342(name: "postMarkdown",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/markdown",
-    validator: validate_PostMarkdown_754343, base: "/", url: url_PostMarkdown_754344,
+    validator: validate_PostMarkdown_754343, base: "/", makeUrl: url_PostMarkdown_754344,
     schemes: {Scheme.Https})
 type
   Call_PostMarkdownRaw_754351 = ref object of OpenApiRestCall_753573
@@ -2637,7 +2616,7 @@ proc url_PostMarkdownRaw_754353(protocol: Scheme; host: string; base: string;
 
 proc validate_PostMarkdownRaw_754352(path: JsonNode; query: JsonNode;
                                     header: JsonNode; formData: JsonNode;
-                                    body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                    body: JsonNode; _: string = ""): JsonNode =
   ## Render a Markdown document in raw mode
   ## 
   var section: JsonNode
@@ -2670,9 +2649,9 @@ proc call*(call_754355: Call_PostMarkdownRaw_754351; path: JsonNode = nil;
   let scheme = call_754355.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754355.url(scheme.get, call_754355.host, call_754355.base,
-                         call_754355.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754355.makeUrl(scheme.get, call_754355.host, call_754355.base,
+                             call_754355.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754355, uri, valid, _)
 
 proc call*(call_754356: Call_PostMarkdownRaw_754351; Accept: string = ""): Recallable =
@@ -2686,8 +2665,8 @@ proc call*(call_754356: Call_PostMarkdownRaw_754351; Accept: string = ""): Recal
 
 var postMarkdownRaw* = Call_PostMarkdownRaw_754351(name: "postMarkdownRaw",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/markdown/raw",
-    validator: validate_PostMarkdownRaw_754352, base: "/", url: url_PostMarkdownRaw_754353,
-    schemes: {Scheme.Https})
+    validator: validate_PostMarkdownRaw_754352, base: "/",
+    makeUrl: url_PostMarkdownRaw_754353, schemes: {Scheme.Https})
 type
   Call_GetMeta_754358 = ref object of OpenApiRestCall_753573
 proc url_GetMeta_754360(protocol: Scheme; host: string; base: string; route: string;
@@ -2702,8 +2681,7 @@ proc url_GetMeta_754360(protocol: Scheme; host: string; base: string; route: str
     result.path = base & route
 
 proc validate_GetMeta_754359(path: JsonNode; query: JsonNode; header: JsonNode;
-                            formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                            formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## This gives some information about GitHub.com, the service.
   ## 
   var section: JsonNode
@@ -2736,9 +2714,9 @@ proc call*(call_754362: Call_GetMeta_754358; path: JsonNode = nil;
   let scheme = call_754362.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754362.url(scheme.get, call_754362.host, call_754362.base,
-                         call_754362.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754362.makeUrl(scheme.get, call_754362.host, call_754362.base,
+                             call_754362.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754362, uri, valid, _)
 
 proc call*(call_754363: Call_GetMeta_754358; Accept: string = ""): Recallable =
@@ -2753,7 +2731,8 @@ proc call*(call_754363: Call_GetMeta_754358; Accept: string = ""): Recallable =
 var getMeta* = Call_GetMeta_754358(name: "getMeta", meth: HttpMethod.HttpGet,
                                 host: "api.github.com", route: "/meta",
                                 validator: validate_GetMeta_754359, base: "/",
-                                url: url_GetMeta_754360, schemes: {Scheme.Https})
+                                makeUrl: url_GetMeta_754360,
+                                schemes: {Scheme.Https})
 type
   Call_GetNetworksOwnerRepoEvents_754365 = ref object of OpenApiRestCall_753573
 proc url_GetNetworksOwnerRepoEvents_754367(protocol: Scheme; host: string;
@@ -2781,8 +2760,7 @@ proc url_GetNetworksOwnerRepoEvents_754367(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetNetworksOwnerRepoEvents_754366(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List public events for a network of repositories.
   ## 
   var section: JsonNode
@@ -2831,9 +2809,9 @@ proc call*(call_754371: Call_GetNetworksOwnerRepoEvents_754365;
   let scheme = call_754371.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754371.url(scheme.get, call_754371.host, call_754371.base,
-                         call_754371.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754371.makeUrl(scheme.get, call_754371.host, call_754371.base,
+                             call_754371.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754371, uri, valid, _)
 
 proc call*(call_754372: Call_GetNetworksOwnerRepoEvents_754365; repo: string;
@@ -2857,7 +2835,7 @@ var getNetworksOwnerRepoEvents* = Call_GetNetworksOwnerRepoEvents_754365(
     name: "getNetworksOwnerRepoEvents", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/networks/{owner}/{repo}/events",
     validator: validate_GetNetworksOwnerRepoEvents_754366, base: "/",
-    url: url_GetNetworksOwnerRepoEvents_754367, schemes: {Scheme.Https})
+    makeUrl: url_GetNetworksOwnerRepoEvents_754367, schemes: {Scheme.Https})
 type
   Call_PutNotifications_754386 = ref object of OpenApiRestCall_753573
 proc url_PutNotifications_754388(protocol: Scheme; host: string; base: string;
@@ -2873,8 +2851,7 @@ proc url_PutNotifications_754388(protocol: Scheme; host: string; base: string;
 
 proc validate_PutNotifications_754387(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Mark as read.
   ## Marking a notification as "read" removes it from the default view on GitHub.com.
   ## 
@@ -2915,9 +2892,9 @@ proc call*(call_754391: Call_PutNotifications_754386; path: JsonNode = nil;
   let scheme = call_754391.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754391.url(scheme.get, call_754391.host, call_754391.base,
-                         call_754391.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754391.makeUrl(scheme.get, call_754391.host, call_754391.base,
+                             call_754391.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754391, uri, valid, _)
 
 proc call*(call_754392: Call_PutNotifications_754386; body: JsonNode;
@@ -2939,7 +2916,7 @@ proc call*(call_754392: Call_PutNotifications_754386; body: JsonNode;
 var putNotifications* = Call_PutNotifications_754386(name: "putNotifications",
     meth: HttpMethod.HttpPut, host: "api.github.com", route: "/notifications",
     validator: validate_PutNotifications_754387, base: "/",
-    url: url_PutNotifications_754388, schemes: {Scheme.Https})
+    makeUrl: url_PutNotifications_754388, schemes: {Scheme.Https})
 type
   Call_GetNotifications_754375 = ref object of OpenApiRestCall_753573
 proc url_GetNotifications_754377(protocol: Scheme; host: string; base: string;
@@ -2955,8 +2932,7 @@ proc url_GetNotifications_754377(protocol: Scheme; host: string; base: string;
 
 proc validate_GetNotifications_754376(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## List your notifications.
   ## List all notifications for the current user, grouped by repository.
   ## 
@@ -3017,9 +2993,9 @@ proc call*(call_754382: Call_GetNotifications_754375; path: JsonNode = nil;
   let scheme = call_754382.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754382.url(scheme.get, call_754382.host, call_754382.base,
-                         call_754382.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754382.makeUrl(scheme.get, call_754382.host, call_754382.base,
+                             call_754382.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754382, uri, valid, _)
 
 proc call*(call_754383: Call_GetNotifications_754375; participating: bool = false;
@@ -3051,7 +3027,7 @@ proc call*(call_754383: Call_GetNotifications_754375; participating: bool = fals
 var getNotifications* = Call_GetNotifications_754375(name: "getNotifications",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/notifications",
     validator: validate_GetNotifications_754376, base: "/",
-    url: url_GetNotifications_754377, schemes: {Scheme.Https})
+    makeUrl: url_GetNotifications_754377, schemes: {Scheme.Https})
 type
   Call_GetNotificationsThreadsId_754395 = ref object of OpenApiRestCall_753573
 proc url_GetNotificationsThreadsId_754397(protocol: Scheme; host: string;
@@ -3075,8 +3051,7 @@ proc url_GetNotificationsThreadsId_754397(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetNotificationsThreadsId_754396(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## View a single thread.
   ## 
   var section: JsonNode
@@ -3117,9 +3092,9 @@ proc call*(call_754400: Call_GetNotificationsThreadsId_754395;
   let scheme = call_754400.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754400.url(scheme.get, call_754400.host, call_754400.base,
-                         call_754400.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754400.makeUrl(scheme.get, call_754400.host, call_754400.base,
+                             call_754400.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754400, uri, valid, _)
 
 proc call*(call_754401: Call_GetNotificationsThreadsId_754395; id: int;
@@ -3140,7 +3115,7 @@ var getNotificationsThreadsId* = Call_GetNotificationsThreadsId_754395(
     name: "getNotificationsThreadsId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/notifications/threads/{id}",
     validator: validate_GetNotificationsThreadsId_754396, base: "/",
-    url: url_GetNotificationsThreadsId_754397, schemes: {Scheme.Https})
+    makeUrl: url_GetNotificationsThreadsId_754397, schemes: {Scheme.Https})
 type
   Call_PatchNotificationsThreadsId_754404 = ref object of OpenApiRestCall_753573
 proc url_PatchNotificationsThreadsId_754406(protocol: Scheme; host: string;
@@ -3164,8 +3139,7 @@ proc url_PatchNotificationsThreadsId_754406(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PatchNotificationsThreadsId_754405(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Mark a thread as read
   ## 
   var section: JsonNode
@@ -3206,9 +3180,9 @@ proc call*(call_754409: Call_PatchNotificationsThreadsId_754404;
   let scheme = call_754409.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754409.url(scheme.get, call_754409.host, call_754409.base,
-                         call_754409.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754409.makeUrl(scheme.get, call_754409.host, call_754409.base,
+                             call_754409.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754409, uri, valid, _)
 
 proc call*(call_754410: Call_PatchNotificationsThreadsId_754404; id: int;
@@ -3229,7 +3203,7 @@ var patchNotificationsThreadsId* = Call_PatchNotificationsThreadsId_754404(
     name: "patchNotificationsThreadsId", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/notifications/threads/{id}",
     validator: validate_PatchNotificationsThreadsId_754405, base: "/",
-    url: url_PatchNotificationsThreadsId_754406, schemes: {Scheme.Https})
+    makeUrl: url_PatchNotificationsThreadsId_754406, schemes: {Scheme.Https})
 type
   Call_PutNotificationsThreadsIdSubscription_754422 = ref object of OpenApiRestCall_753573
 proc url_PutNotificationsThreadsIdSubscription_754424(protocol: Scheme;
@@ -3255,7 +3229,7 @@ proc url_PutNotificationsThreadsIdSubscription_754424(protocol: Scheme;
 
 proc validate_PutNotificationsThreadsIdSubscription_754423(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Set a Thread Subscription.
   ## This lets you subscribe to a thread, or ignore it. Subscribing to a thread
   ## is unnecessary if the user is already subscribed to the repository. Ignoring
@@ -3308,9 +3282,9 @@ proc call*(call_754428: Call_PutNotificationsThreadsIdSubscription_754422;
   let scheme = call_754428.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754428.url(scheme.get, call_754428.host, call_754428.base,
-                         call_754428.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754428.makeUrl(scheme.get, call_754428.host, call_754428.base,
+                             call_754428.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754428, uri, valid, _)
 
 proc call*(call_754429: Call_PutNotificationsThreadsIdSubscription_754422; id: int;
@@ -3339,7 +3313,8 @@ var putNotificationsThreadsIdSubscription* = Call_PutNotificationsThreadsIdSubsc
     name: "putNotificationsThreadsIdSubscription", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/notifications/threads/{id}/subscription",
     validator: validate_PutNotificationsThreadsIdSubscription_754423, base: "/",
-    url: url_PutNotificationsThreadsIdSubscription_754424, schemes: {Scheme.Https})
+    makeUrl: url_PutNotificationsThreadsIdSubscription_754424,
+    schemes: {Scheme.Https})
 type
   Call_GetNotificationsThreadsIdSubscription_754413 = ref object of OpenApiRestCall_753573
 proc url_GetNotificationsThreadsIdSubscription_754415(protocol: Scheme;
@@ -3365,7 +3340,7 @@ proc url_GetNotificationsThreadsIdSubscription_754415(protocol: Scheme;
 
 proc validate_GetNotificationsThreadsIdSubscription_754414(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a Thread Subscription.
   ## 
   var section: JsonNode
@@ -3406,9 +3381,9 @@ proc call*(call_754418: Call_GetNotificationsThreadsIdSubscription_754413;
   let scheme = call_754418.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754418.url(scheme.get, call_754418.host, call_754418.base,
-                         call_754418.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754418.makeUrl(scheme.get, call_754418.host, call_754418.base,
+                             call_754418.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754418, uri, valid, _)
 
 proc call*(call_754419: Call_GetNotificationsThreadsIdSubscription_754413; id: int;
@@ -3429,7 +3404,8 @@ var getNotificationsThreadsIdSubscription* = Call_GetNotificationsThreadsIdSubsc
     name: "getNotificationsThreadsIdSubscription", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/notifications/threads/{id}/subscription",
     validator: validate_GetNotificationsThreadsIdSubscription_754414, base: "/",
-    url: url_GetNotificationsThreadsIdSubscription_754415, schemes: {Scheme.Https})
+    makeUrl: url_GetNotificationsThreadsIdSubscription_754415,
+    schemes: {Scheme.Https})
 type
   Call_DeleteNotificationsThreadsIdSubscription_754433 = ref object of OpenApiRestCall_753573
 proc url_DeleteNotificationsThreadsIdSubscription_754435(protocol: Scheme;
@@ -3455,7 +3431,7 @@ proc url_DeleteNotificationsThreadsIdSubscription_754435(protocol: Scheme;
 
 proc validate_DeleteNotificationsThreadsIdSubscription_754434(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a Thread Subscription.
   ## 
   var section: JsonNode
@@ -3496,9 +3472,9 @@ proc call*(call_754438: Call_DeleteNotificationsThreadsIdSubscription_754433;
   let scheme = call_754438.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754438.url(scheme.get, call_754438.host, call_754438.base,
-                         call_754438.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754438.makeUrl(scheme.get, call_754438.host, call_754438.base,
+                             call_754438.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754438, uri, valid, _)
 
 proc call*(call_754439: Call_DeleteNotificationsThreadsIdSubscription_754433;
@@ -3519,7 +3495,7 @@ var deleteNotificationsThreadsIdSubscription* = Call_DeleteNotificationsThreadsI
     name: "deleteNotificationsThreadsIdSubscription", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/notifications/threads/{id}/subscription",
     validator: validate_DeleteNotificationsThreadsIdSubscription_754434,
-    base: "/", url: url_DeleteNotificationsThreadsIdSubscription_754435,
+    base: "/", makeUrl: url_DeleteNotificationsThreadsIdSubscription_754435,
     schemes: {Scheme.Https})
 type
   Call_GetOrgsOrg_754442 = ref object of OpenApiRestCall_753573
@@ -3544,8 +3520,7 @@ proc url_GetOrgsOrg_754444(protocol: Scheme; host: string; base: string; route: 
     result.path = base & hydrated.get
 
 proc validate_GetOrgsOrg_754443(path: JsonNode; query: JsonNode; header: JsonNode;
-                               formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                               formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get an Organization.
   ## 
   var section: JsonNode
@@ -3587,9 +3562,9 @@ proc call*(call_754447: Call_GetOrgsOrg_754442; path: JsonNode = nil;
   let scheme = call_754447.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754447.url(scheme.get, call_754447.host, call_754447.base,
-                         call_754447.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754447.makeUrl(scheme.get, call_754447.host, call_754447.base,
+                             call_754447.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754447, uri, valid, _)
 
 proc call*(call_754448: Call_GetOrgsOrg_754442; org: string; Accept: string = ""): Recallable =
@@ -3610,7 +3585,7 @@ var getOrgsOrg* = Call_GetOrgsOrg_754442(name: "getOrgsOrg",
                                       host: "api.github.com",
                                       route: "/orgs/{org}",
                                       validator: validate_GetOrgsOrg_754443,
-                                      base: "/", url: url_GetOrgsOrg_754444,
+                                      base: "/", makeUrl: url_GetOrgsOrg_754444,
                                       schemes: {Scheme.Https})
 type
   Call_PatchOrgsOrg_754451 = ref object of OpenApiRestCall_753573
@@ -3635,8 +3610,7 @@ proc url_PatchOrgsOrg_754453(protocol: Scheme; host: string; base: string;
     result.path = base & hydrated.get
 
 proc validate_PatchOrgsOrg_754452(path: JsonNode; query: JsonNode; header: JsonNode;
-                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Edit an Organization.
   ## 
   var section: JsonNode
@@ -3682,9 +3656,9 @@ proc call*(call_754457: Call_PatchOrgsOrg_754451; path: JsonNode = nil;
   let scheme = call_754457.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754457.url(scheme.get, call_754457.host, call_754457.base,
-                         call_754457.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754457.makeUrl(scheme.get, call_754457.host, call_754457.base,
+                             call_754457.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754457, uri, valid, _)
 
 proc call*(call_754458: Call_PatchOrgsOrg_754451; org: string; body: JsonNode;
@@ -3707,7 +3681,7 @@ proc call*(call_754458: Call_PatchOrgsOrg_754451; org: string; body: JsonNode;
 
 var patchOrgsOrg* = Call_PatchOrgsOrg_754451(name: "patchOrgsOrg",
     meth: HttpMethod.HttpPatch, host: "api.github.com", route: "/orgs/{org}",
-    validator: validate_PatchOrgsOrg_754452, base: "/", url: url_PatchOrgsOrg_754453,
+    validator: validate_PatchOrgsOrg_754452, base: "/", makeUrl: url_PatchOrgsOrg_754453,
     schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgEvents_754462 = ref object of OpenApiRestCall_753573
@@ -3734,8 +3708,7 @@ proc url_GetOrgsOrgEvents_754464(protocol: Scheme; host: string; base: string;
 
 proc validate_GetOrgsOrgEvents_754463(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## List public events for an organization.
   ## 
   var section: JsonNode
@@ -3777,9 +3750,9 @@ proc call*(call_754467: Call_GetOrgsOrgEvents_754462; path: JsonNode = nil;
   let scheme = call_754467.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754467.url(scheme.get, call_754467.host, call_754467.base,
-                         call_754467.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754467.makeUrl(scheme.get, call_754467.host, call_754467.base,
+                             call_754467.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754467, uri, valid, _)
 
 proc call*(call_754468: Call_GetOrgsOrgEvents_754462; org: string;
@@ -3799,7 +3772,7 @@ proc call*(call_754468: Call_GetOrgsOrgEvents_754462; org: string;
 var getOrgsOrgEvents* = Call_GetOrgsOrgEvents_754462(name: "getOrgsOrgEvents",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/orgs/{org}/events",
     validator: validate_GetOrgsOrgEvents_754463, base: "/",
-    url: url_GetOrgsOrgEvents_754464, schemes: {Scheme.Https})
+    makeUrl: url_GetOrgsOrgEvents_754464, schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgIssues_754471 = ref object of OpenApiRestCall_753573
 proc url_GetOrgsOrgIssues_754473(protocol: Scheme; host: string; base: string;
@@ -3825,8 +3798,7 @@ proc url_GetOrgsOrgIssues_754473(protocol: Scheme; host: string; base: string;
 
 proc validate_GetOrgsOrgIssues_754472(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## List issues.
   ## List all issues for a given organization for the authenticated user.
   ## 
@@ -3916,9 +3888,9 @@ proc call*(call_754482: Call_GetOrgsOrgIssues_754471; path: JsonNode = nil;
   let scheme = call_754482.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754482.url(scheme.get, call_754482.host, call_754482.base,
-                         call_754482.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754482.makeUrl(scheme.get, call_754482.host, call_754482.base,
+                             call_754482.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754482, uri, valid, _)
 
 proc call*(call_754483: Call_GetOrgsOrgIssues_754471; labels: string; org: string;
@@ -3961,7 +3933,7 @@ proc call*(call_754483: Call_GetOrgsOrgIssues_754471; labels: string; org: strin
 var getOrgsOrgIssues* = Call_GetOrgsOrgIssues_754471(name: "getOrgsOrgIssues",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/orgs/{org}/issues",
     validator: validate_GetOrgsOrgIssues_754472, base: "/",
-    url: url_GetOrgsOrgIssues_754473, schemes: {Scheme.Https})
+    makeUrl: url_GetOrgsOrgIssues_754473, schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgMembers_754487 = ref object of OpenApiRestCall_753573
 proc url_GetOrgsOrgMembers_754489(protocol: Scheme; host: string; base: string;
@@ -3987,8 +3959,7 @@ proc url_GetOrgsOrgMembers_754489(protocol: Scheme; host: string; base: string;
 
 proc validate_GetOrgsOrgMembers_754488(path: JsonNode; query: JsonNode;
                                       header: JsonNode; formData: JsonNode;
-                                      body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                      body: JsonNode; _: string = ""): JsonNode =
   ## Members list.
   ## List all users who are members of an organization. A member is a user tha
   ## belongs to at least 1 team in the organization. If the authenticated user
@@ -4042,9 +4013,9 @@ proc call*(call_754492: Call_GetOrgsOrgMembers_754487; path: JsonNode = nil;
   let scheme = call_754492.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754492.url(scheme.get, call_754492.host, call_754492.base,
-                         call_754492.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754492.makeUrl(scheme.get, call_754492.host, call_754492.base,
+                             call_754492.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754492, uri, valid, _)
 
 proc call*(call_754493: Call_GetOrgsOrgMembers_754487; org: string;
@@ -4070,7 +4041,7 @@ proc call*(call_754493: Call_GetOrgsOrgMembers_754487; org: string;
 var getOrgsOrgMembers* = Call_GetOrgsOrgMembers_754487(name: "getOrgsOrgMembers",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/orgs/{org}/members",
     validator: validate_GetOrgsOrgMembers_754488, base: "/",
-    url: url_GetOrgsOrgMembers_754489, schemes: {Scheme.Https})
+    makeUrl: url_GetOrgsOrgMembers_754489, schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgMembersUsername_754496 = ref object of OpenApiRestCall_753573
 proc url_GetOrgsOrgMembersUsername_754498(protocol: Scheme; host: string;
@@ -4097,8 +4068,7 @@ proc url_GetOrgsOrgMembersUsername_754498(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetOrgsOrgMembersUsername_754497(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Check if a user is, publicly or privately, a member of the organization.
   ## 
   var section: JsonNode
@@ -4147,9 +4117,9 @@ proc call*(call_754502: Call_GetOrgsOrgMembersUsername_754496;
   let scheme = call_754502.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754502.url(scheme.get, call_754502.host, call_754502.base,
-                         call_754502.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754502.makeUrl(scheme.get, call_754502.host, call_754502.base,
+                             call_754502.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754502, uri, valid, _)
 
 proc call*(call_754503: Call_GetOrgsOrgMembersUsername_754496; username: string;
@@ -4173,7 +4143,7 @@ var getOrgsOrgMembersUsername* = Call_GetOrgsOrgMembersUsername_754496(
     name: "getOrgsOrgMembersUsername", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/orgs/{org}/members/{username}",
     validator: validate_GetOrgsOrgMembersUsername_754497, base: "/",
-    url: url_GetOrgsOrgMembersUsername_754498, schemes: {Scheme.Https})
+    makeUrl: url_GetOrgsOrgMembersUsername_754498, schemes: {Scheme.Https})
 type
   Call_DeleteOrgsOrgMembersUsername_754506 = ref object of OpenApiRestCall_753573
 proc url_DeleteOrgsOrgMembersUsername_754508(protocol: Scheme; host: string;
@@ -4200,8 +4170,7 @@ proc url_DeleteOrgsOrgMembersUsername_754508(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_DeleteOrgsOrgMembersUsername_754507(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Remove a member.
   ## Removing a user from this list will remove them from all teams and they
   ## will no longer have any access to the organization's repositories.
@@ -4256,9 +4225,9 @@ proc call*(call_754512: Call_DeleteOrgsOrgMembersUsername_754506;
   let scheme = call_754512.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754512.url(scheme.get, call_754512.host, call_754512.base,
-                         call_754512.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754512.makeUrl(scheme.get, call_754512.host, call_754512.base,
+                             call_754512.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754512, uri, valid, _)
 
 proc call*(call_754513: Call_DeleteOrgsOrgMembersUsername_754506; username: string;
@@ -4285,7 +4254,7 @@ var deleteOrgsOrgMembersUsername* = Call_DeleteOrgsOrgMembersUsername_754506(
     name: "deleteOrgsOrgMembersUsername", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/orgs/{org}/members/{username}",
     validator: validate_DeleteOrgsOrgMembersUsername_754507, base: "/",
-    url: url_DeleteOrgsOrgMembersUsername_754508, schemes: {Scheme.Https})
+    makeUrl: url_DeleteOrgsOrgMembersUsername_754508, schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgPublicMembers_754516 = ref object of OpenApiRestCall_753573
 proc url_GetOrgsOrgPublicMembers_754518(protocol: Scheme; host: string; base: string;
@@ -4311,8 +4280,7 @@ proc url_GetOrgsOrgPublicMembers_754518(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetOrgsOrgPublicMembers_754517(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Public members list.
   ## Members of an organization can choose to have their membership publicized
   ## or not.
@@ -4360,9 +4328,9 @@ proc call*(call_754521: Call_GetOrgsOrgPublicMembers_754516; path: JsonNode = ni
   let scheme = call_754521.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754521.url(scheme.get, call_754521.host, call_754521.base,
-                         call_754521.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754521.makeUrl(scheme.get, call_754521.host, call_754521.base,
+                             call_754521.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754521, uri, valid, _)
 
 proc call*(call_754522: Call_GetOrgsOrgPublicMembers_754516; org: string;
@@ -4386,7 +4354,7 @@ var getOrgsOrgPublicMembers* = Call_GetOrgsOrgPublicMembers_754516(
     name: "getOrgsOrgPublicMembers", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/orgs/{org}/public_members",
     validator: validate_GetOrgsOrgPublicMembers_754517, base: "/",
-    url: url_GetOrgsOrgPublicMembers_754518, schemes: {Scheme.Https})
+    makeUrl: url_GetOrgsOrgPublicMembers_754518, schemes: {Scheme.Https})
 type
   Call_PutOrgsOrgPublicMembersUsername_754535 = ref object of OpenApiRestCall_753573
 proc url_PutOrgsOrgPublicMembersUsername_754537(protocol: Scheme; host: string;
@@ -4414,7 +4382,7 @@ proc url_PutOrgsOrgPublicMembersUsername_754537(protocol: Scheme; host: string;
 
 proc validate_PutOrgsOrgPublicMembersUsername_754536(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Publicize a user's membership.
   ## 
   var section: JsonNode
@@ -4463,9 +4431,9 @@ proc call*(call_754541: Call_PutOrgsOrgPublicMembersUsername_754535;
   let scheme = call_754541.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754541.url(scheme.get, call_754541.host, call_754541.base,
-                         call_754541.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754541.makeUrl(scheme.get, call_754541.host, call_754541.base,
+                             call_754541.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754541, uri, valid, _)
 
 proc call*(call_754542: Call_PutOrgsOrgPublicMembersUsername_754535;
@@ -4489,7 +4457,7 @@ var putOrgsOrgPublicMembersUsername* = Call_PutOrgsOrgPublicMembersUsername_7545
     name: "putOrgsOrgPublicMembersUsername", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/orgs/{org}/public_members/{username}",
     validator: validate_PutOrgsOrgPublicMembersUsername_754536, base: "/",
-    url: url_PutOrgsOrgPublicMembersUsername_754537, schemes: {Scheme.Https})
+    makeUrl: url_PutOrgsOrgPublicMembersUsername_754537, schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgPublicMembersUsername_754525 = ref object of OpenApiRestCall_753573
 proc url_GetOrgsOrgPublicMembersUsername_754527(protocol: Scheme; host: string;
@@ -4517,7 +4485,7 @@ proc url_GetOrgsOrgPublicMembersUsername_754527(protocol: Scheme; host: string;
 
 proc validate_GetOrgsOrgPublicMembersUsername_754526(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Check public membership.
   ## 
   var section: JsonNode
@@ -4566,9 +4534,9 @@ proc call*(call_754531: Call_GetOrgsOrgPublicMembersUsername_754525;
   let scheme = call_754531.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754531.url(scheme.get, call_754531.host, call_754531.base,
-                         call_754531.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754531.makeUrl(scheme.get, call_754531.host, call_754531.base,
+                             call_754531.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754531, uri, valid, _)
 
 proc call*(call_754532: Call_GetOrgsOrgPublicMembersUsername_754525;
@@ -4592,7 +4560,7 @@ var getOrgsOrgPublicMembersUsername* = Call_GetOrgsOrgPublicMembersUsername_7545
     name: "getOrgsOrgPublicMembersUsername", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/orgs/{org}/public_members/{username}",
     validator: validate_GetOrgsOrgPublicMembersUsername_754526, base: "/",
-    url: url_GetOrgsOrgPublicMembersUsername_754527, schemes: {Scheme.Https})
+    makeUrl: url_GetOrgsOrgPublicMembersUsername_754527, schemes: {Scheme.Https})
 type
   Call_DeleteOrgsOrgPublicMembersUsername_754545 = ref object of OpenApiRestCall_753573
 proc url_DeleteOrgsOrgPublicMembersUsername_754547(protocol: Scheme; host: string;
@@ -4620,7 +4588,7 @@ proc url_DeleteOrgsOrgPublicMembersUsername_754547(protocol: Scheme; host: strin
 
 proc validate_DeleteOrgsOrgPublicMembersUsername_754546(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Conceal a user's membership.
   ## 
   var section: JsonNode
@@ -4669,9 +4637,9 @@ proc call*(call_754551: Call_DeleteOrgsOrgPublicMembersUsername_754545;
   let scheme = call_754551.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754551.url(scheme.get, call_754551.host, call_754551.base,
-                         call_754551.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754551.makeUrl(scheme.get, call_754551.host, call_754551.base,
+                             call_754551.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754551, uri, valid, _)
 
 proc call*(call_754552: Call_DeleteOrgsOrgPublicMembersUsername_754545;
@@ -4695,7 +4663,8 @@ var deleteOrgsOrgPublicMembersUsername* = Call_DeleteOrgsOrgPublicMembersUsernam
     name: "deleteOrgsOrgPublicMembersUsername", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/orgs/{org}/public_members/{username}",
     validator: validate_DeleteOrgsOrgPublicMembersUsername_754546, base: "/",
-    url: url_DeleteOrgsOrgPublicMembersUsername_754547, schemes: {Scheme.Https})
+    makeUrl: url_DeleteOrgsOrgPublicMembersUsername_754547,
+    schemes: {Scheme.Https})
 type
   Call_PostOrgsOrgRepos_754566 = ref object of OpenApiRestCall_753573
 proc url_PostOrgsOrgRepos_754568(protocol: Scheme; host: string; base: string;
@@ -4721,8 +4690,7 @@ proc url_PostOrgsOrgRepos_754568(protocol: Scheme; host: string; base: string;
 
 proc validate_PostOrgsOrgRepos_754567(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Create a new repository for the authenticated user. OAuth users must supply
   ## repo scope.
   ## 
@@ -4772,9 +4740,9 @@ proc call*(call_754572: Call_PostOrgsOrgRepos_754566; path: JsonNode = nil;
   let scheme = call_754572.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754572.url(scheme.get, call_754572.host, call_754572.base,
-                         call_754572.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754572.makeUrl(scheme.get, call_754572.host, call_754572.base,
+                             call_754572.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754572, uri, valid, _)
 
 proc call*(call_754573: Call_PostOrgsOrgRepos_754566; org: string; body: JsonNode;
@@ -4800,7 +4768,7 @@ proc call*(call_754573: Call_PostOrgsOrgRepos_754566; org: string; body: JsonNod
 var postOrgsOrgRepos* = Call_PostOrgsOrgRepos_754566(name: "postOrgsOrgRepos",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/orgs/{org}/repos",
     validator: validate_PostOrgsOrgRepos_754567, base: "/",
-    url: url_PostOrgsOrgRepos_754568, schemes: {Scheme.Https})
+    makeUrl: url_PostOrgsOrgRepos_754568, schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgRepos_754555 = ref object of OpenApiRestCall_753573
 proc url_GetOrgsOrgRepos_754557(protocol: Scheme; host: string; base: string;
@@ -4826,7 +4794,7 @@ proc url_GetOrgsOrgRepos_754557(protocol: Scheme; host: string; base: string;
 
 proc validate_GetOrgsOrgRepos_754556(path: JsonNode; query: JsonNode;
                                     header: JsonNode; formData: JsonNode;
-                                    body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                    body: JsonNode; _: string = ""): JsonNode =
   ## List repositories for the specified org.
   ## 
   var section: JsonNode
@@ -4875,9 +4843,9 @@ proc call*(call_754561: Call_GetOrgsOrgRepos_754555; path: JsonNode = nil;
   let scheme = call_754561.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754561.url(scheme.get, call_754561.host, call_754561.base,
-                         call_754561.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754561.makeUrl(scheme.get, call_754561.host, call_754561.base,
+                             call_754561.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754561, uri, valid, _)
 
 proc call*(call_754562: Call_GetOrgsOrgRepos_754555; org: string;
@@ -4899,8 +4867,8 @@ proc call*(call_754562: Call_GetOrgsOrgRepos_754555; org: string;
 
 var getOrgsOrgRepos* = Call_GetOrgsOrgRepos_754555(name: "getOrgsOrgRepos",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/orgs/{org}/repos",
-    validator: validate_GetOrgsOrgRepos_754556, base: "/", url: url_GetOrgsOrgRepos_754557,
-    schemes: {Scheme.Https})
+    validator: validate_GetOrgsOrgRepos_754556, base: "/",
+    makeUrl: url_GetOrgsOrgRepos_754557, schemes: {Scheme.Https})
 type
   Call_PostOrgsOrgTeams_754586 = ref object of OpenApiRestCall_753573
 proc url_PostOrgsOrgTeams_754588(protocol: Scheme; host: string; base: string;
@@ -4926,8 +4894,7 @@ proc url_PostOrgsOrgTeams_754588(protocol: Scheme; host: string; base: string;
 
 proc validate_PostOrgsOrgTeams_754587(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Create team.
   ## In order to create a team, the authenticated user must be an owner of organization.
   ## 
@@ -4977,9 +4944,9 @@ proc call*(call_754592: Call_PostOrgsOrgTeams_754586; path: JsonNode = nil;
   let scheme = call_754592.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754592.url(scheme.get, call_754592.host, call_754592.base,
-                         call_754592.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754592.makeUrl(scheme.get, call_754592.host, call_754592.base,
+                             call_754592.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754592, uri, valid, _)
 
 proc call*(call_754593: Call_PostOrgsOrgTeams_754586; org: string; body: JsonNode;
@@ -5005,7 +4972,7 @@ proc call*(call_754593: Call_PostOrgsOrgTeams_754586; org: string; body: JsonNod
 var postOrgsOrgTeams* = Call_PostOrgsOrgTeams_754586(name: "postOrgsOrgTeams",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/orgs/{org}/teams",
     validator: validate_PostOrgsOrgTeams_754587, base: "/",
-    url: url_PostOrgsOrgTeams_754588, schemes: {Scheme.Https})
+    makeUrl: url_PostOrgsOrgTeams_754588, schemes: {Scheme.Https})
 type
   Call_GetOrgsOrgTeams_754577 = ref object of OpenApiRestCall_753573
 proc url_GetOrgsOrgTeams_754579(protocol: Scheme; host: string; base: string;
@@ -5031,7 +4998,7 @@ proc url_GetOrgsOrgTeams_754579(protocol: Scheme; host: string; base: string;
 
 proc validate_GetOrgsOrgTeams_754578(path: JsonNode; query: JsonNode;
                                     header: JsonNode; formData: JsonNode;
-                                    body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                    body: JsonNode; _: string = ""): JsonNode =
   ## List teams.
   ## 
   var section: JsonNode
@@ -5073,9 +5040,9 @@ proc call*(call_754582: Call_GetOrgsOrgTeams_754577; path: JsonNode = nil;
   let scheme = call_754582.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754582.url(scheme.get, call_754582.host, call_754582.base,
-                         call_754582.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754582.makeUrl(scheme.get, call_754582.host, call_754582.base,
+                             call_754582.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754582, uri, valid, _)
 
 proc call*(call_754583: Call_GetOrgsOrgTeams_754577; org: string; Accept: string = ""): Recallable =
@@ -5093,8 +5060,8 @@ proc call*(call_754583: Call_GetOrgsOrgTeams_754577; org: string; Accept: string
 
 var getOrgsOrgTeams* = Call_GetOrgsOrgTeams_754577(name: "getOrgsOrgTeams",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/orgs/{org}/teams",
-    validator: validate_GetOrgsOrgTeams_754578, base: "/", url: url_GetOrgsOrgTeams_754579,
-    schemes: {Scheme.Https})
+    validator: validate_GetOrgsOrgTeams_754578, base: "/",
+    makeUrl: url_GetOrgsOrgTeams_754579, schemes: {Scheme.Https})
 type
   Call_GetRateLimit_754597 = ref object of OpenApiRestCall_753573
 proc url_GetRateLimit_754599(protocol: Scheme; host: string; base: string;
@@ -5109,8 +5076,7 @@ proc url_GetRateLimit_754599(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetRateLimit_754598(path: JsonNode; query: JsonNode; header: JsonNode;
-                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get your current rate limit status
   ## Note: Accessing this endpoint does not count against your rate limit.
   ## 
@@ -5147,9 +5113,9 @@ proc call*(call_754601: Call_GetRateLimit_754597; path: JsonNode = nil;
   let scheme = call_754601.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754601.url(scheme.get, call_754601.host, call_754601.base,
-                         call_754601.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754601.makeUrl(scheme.get, call_754601.host, call_754601.base,
+                             call_754601.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754601, uri, valid, _)
 
 proc call*(call_754602: Call_GetRateLimit_754597; Accept: string = ""): Recallable =
@@ -5165,7 +5131,7 @@ proc call*(call_754602: Call_GetRateLimit_754597; Accept: string = ""): Recallab
 
 var getRateLimit* = Call_GetRateLimit_754597(name: "getRateLimit",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/rate_limit",
-    validator: validate_GetRateLimit_754598, base: "/", url: url_GetRateLimit_754599,
+    validator: validate_GetRateLimit_754598, base: "/", makeUrl: url_GetRateLimit_754599,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepo_754604 = ref object of OpenApiRestCall_753573
@@ -5194,8 +5160,7 @@ proc url_GetReposOwnerRepo_754606(protocol: Scheme; host: string; base: string;
 
 proc validate_GetReposOwnerRepo_754605(path: JsonNode; query: JsonNode;
                                       header: JsonNode; formData: JsonNode;
-                                      body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                      body: JsonNode; _: string = ""): JsonNode =
   ## Get repository.
   ## 
   var section: JsonNode
@@ -5244,9 +5209,9 @@ proc call*(call_754610: Call_GetReposOwnerRepo_754604; path: JsonNode = nil;
   let scheme = call_754610.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754610.url(scheme.get, call_754610.host, call_754610.base,
-                         call_754610.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754610.makeUrl(scheme.get, call_754610.host, call_754610.base,
+                             call_754610.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754610, uri, valid, _)
 
 proc call*(call_754611: Call_GetReposOwnerRepo_754604; repo: string; owner: string;
@@ -5269,7 +5234,7 @@ proc call*(call_754611: Call_GetReposOwnerRepo_754604; repo: string; owner: stri
 var getReposOwnerRepo* = Call_GetReposOwnerRepo_754604(name: "getReposOwnerRepo",
     meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/repos/{owner}/{repo}", validator: validate_GetReposOwnerRepo_754605,
-    base: "/", url: url_GetReposOwnerRepo_754606, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetReposOwnerRepo_754606, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepo_754624 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepo_754626(protocol: Scheme; host: string; base: string;
@@ -5297,8 +5262,7 @@ proc url_PatchReposOwnerRepo_754626(protocol: Scheme; host: string; base: string
 
 proc validate_PatchReposOwnerRepo_754625(path: JsonNode; query: JsonNode;
                                         header: JsonNode; formData: JsonNode;
-                                        body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                        body: JsonNode; _: string = ""): JsonNode =
   ## Edit repository.
   ## 
   var section: JsonNode
@@ -5351,9 +5315,9 @@ proc call*(call_754631: Call_PatchReposOwnerRepo_754624; path: JsonNode = nil;
   let scheme = call_754631.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754631.url(scheme.get, call_754631.host, call_754631.base,
-                         call_754631.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754631.makeUrl(scheme.get, call_754631.host, call_754631.base,
+                             call_754631.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754631, uri, valid, _)
 
 proc call*(call_754632: Call_PatchReposOwnerRepo_754624; repo: string;
@@ -5380,7 +5344,7 @@ proc call*(call_754632: Call_PatchReposOwnerRepo_754624; repo: string;
 var patchReposOwnerRepo* = Call_PatchReposOwnerRepo_754624(
     name: "patchReposOwnerRepo", meth: HttpMethod.HttpPatch, host: "api.github.com",
     route: "/repos/{owner}/{repo}", validator: validate_PatchReposOwnerRepo_754625,
-    base: "/", url: url_PatchReposOwnerRepo_754626, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_PatchReposOwnerRepo_754626, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepo_754614 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepo_754616(protocol: Scheme; host: string; base: string;
@@ -5407,8 +5371,7 @@ proc url_DeleteReposOwnerRepo_754616(protocol: Scheme; host: string; base: strin
     result.path = base & hydrated.get
 
 proc validate_DeleteReposOwnerRepo_754615(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Delete a Repository.
   ## Deleting a repository requires admin access. If OAuth is used, the delete_repo
   ## scope is required.
@@ -5463,9 +5426,9 @@ proc call*(call_754620: Call_DeleteReposOwnerRepo_754614; path: JsonNode = nil;
   let scheme = call_754620.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754620.url(scheme.get, call_754620.host, call_754620.base,
-                         call_754620.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754620.makeUrl(scheme.get, call_754620.host, call_754620.base,
+                             call_754620.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754620, uri, valid, _)
 
 proc call*(call_754621: Call_DeleteReposOwnerRepo_754614; repo: string;
@@ -5492,7 +5455,7 @@ var deleteReposOwnerRepo* = Call_DeleteReposOwnerRepo_754614(
     name: "deleteReposOwnerRepo", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}",
     validator: validate_DeleteReposOwnerRepo_754615, base: "/",
-    url: url_DeleteReposOwnerRepo_754616, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepo_754616, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoAssignees_754636 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoAssignees_754638(protocol: Scheme; host: string;
@@ -5520,8 +5483,7 @@ proc url_GetReposOwnerRepoAssignees_754638(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoAssignees_754637(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List assignees.
   ## This call lists all the available assignees (owner + collaborators) to which
   ## issues may be assigned.
@@ -5576,9 +5538,9 @@ proc call*(call_754642: Call_GetReposOwnerRepoAssignees_754636;
   let scheme = call_754642.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754642.url(scheme.get, call_754642.host, call_754642.base,
-                         call_754642.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754642.makeUrl(scheme.get, call_754642.host, call_754642.base,
+                             call_754642.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754642, uri, valid, _)
 
 proc call*(call_754643: Call_GetReposOwnerRepoAssignees_754636; repo: string;
@@ -5605,7 +5567,7 @@ var getReposOwnerRepoAssignees* = Call_GetReposOwnerRepoAssignees_754636(
     name: "getReposOwnerRepoAssignees", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/assignees",
     validator: validate_GetReposOwnerRepoAssignees_754637, base: "/",
-    url: url_GetReposOwnerRepoAssignees_754638, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoAssignees_754638, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoAssigneesAssignee_754646 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoAssigneesAssignee_754648(protocol: Scheme; host: string;
@@ -5636,7 +5598,7 @@ proc url_GetReposOwnerRepoAssigneesAssignee_754648(protocol: Scheme; host: strin
 
 proc validate_GetReposOwnerRepoAssigneesAssignee_754647(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Check assignee.
   ## You may also check to see if a particular user is an assignee for a repository.
   ## 
@@ -5696,9 +5658,9 @@ proc call*(call_754653: Call_GetReposOwnerRepoAssigneesAssignee_754646;
   let scheme = call_754653.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754653.url(scheme.get, call_754653.host, call_754653.base,
-                         call_754653.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754653.makeUrl(scheme.get, call_754653.host, call_754653.base,
+                             call_754653.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754653, uri, valid, _)
 
 proc call*(call_754654: Call_GetReposOwnerRepoAssigneesAssignee_754646;
@@ -5727,7 +5689,8 @@ var getReposOwnerRepoAssigneesAssignee* = Call_GetReposOwnerRepoAssigneesAssigne
     name: "getReposOwnerRepoAssigneesAssignee", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/assignees/{assignee}",
     validator: validate_GetReposOwnerRepoAssigneesAssignee_754647, base: "/",
-    url: url_GetReposOwnerRepoAssigneesAssignee_754648, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoAssigneesAssignee_754648,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoBranches_754657 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoBranches_754659(protocol: Scheme; host: string;
@@ -5755,8 +5718,7 @@ proc url_GetReposOwnerRepoBranches_754659(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoBranches_754658(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get list of branches
   ## 
   var section: JsonNode
@@ -5805,9 +5767,9 @@ proc call*(call_754663: Call_GetReposOwnerRepoBranches_754657;
   let scheme = call_754663.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754663.url(scheme.get, call_754663.host, call_754663.base,
-                         call_754663.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754663.makeUrl(scheme.get, call_754663.host, call_754663.base,
+                             call_754663.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754663, uri, valid, _)
 
 proc call*(call_754664: Call_GetReposOwnerRepoBranches_754657; repo: string;
@@ -5831,7 +5793,7 @@ var getReposOwnerRepoBranches* = Call_GetReposOwnerRepoBranches_754657(
     name: "getReposOwnerRepoBranches", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/branches",
     validator: validate_GetReposOwnerRepoBranches_754658, base: "/",
-    url: url_GetReposOwnerRepoBranches_754659, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoBranches_754659, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoBranchesBranch_754667 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoBranchesBranch_754669(protocol: Scheme; host: string;
@@ -5862,7 +5824,7 @@ proc url_GetReposOwnerRepoBranchesBranch_754669(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoBranchesBranch_754668(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get Branch
   ## 
   var section: JsonNode
@@ -5918,9 +5880,9 @@ proc call*(call_754674: Call_GetReposOwnerRepoBranchesBranch_754667;
   let scheme = call_754674.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754674.url(scheme.get, call_754674.host, call_754674.base,
-                         call_754674.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754674.makeUrl(scheme.get, call_754674.host, call_754674.base,
+                             call_754674.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754674, uri, valid, _)
 
 proc call*(call_754675: Call_GetReposOwnerRepoBranchesBranch_754667;
@@ -5947,7 +5909,7 @@ var getReposOwnerRepoBranchesBranch* = Call_GetReposOwnerRepoBranchesBranch_7546
     name: "getReposOwnerRepoBranchesBranch", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/branches/{branch}",
     validator: validate_GetReposOwnerRepoBranchesBranch_754668, base: "/",
-    url: url_GetReposOwnerRepoBranchesBranch_754669, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoBranchesBranch_754669, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCollaborators_754678 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoCollaborators_754680(protocol: Scheme; host: string;
@@ -5976,7 +5938,7 @@ proc url_GetReposOwnerRepoCollaborators_754680(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoCollaborators_754679(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List.
   ## When authenticating as an organization owner of an organization-owned
   ## repository, all organization owners are included in the list of
@@ -6035,9 +5997,9 @@ proc call*(call_754684: Call_GetReposOwnerRepoCollaborators_754678;
   let scheme = call_754684.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754684.url(scheme.get, call_754684.host, call_754684.base,
-                         call_754684.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754684.makeUrl(scheme.get, call_754684.host, call_754684.base,
+                             call_754684.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754684, uri, valid, _)
 
 proc call*(call_754685: Call_GetReposOwnerRepoCollaborators_754678; repo: string;
@@ -6066,7 +6028,7 @@ var getReposOwnerRepoCollaborators* = Call_GetReposOwnerRepoCollaborators_754678
     name: "getReposOwnerRepoCollaborators", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/collaborators",
     validator: validate_GetReposOwnerRepoCollaborators_754679, base: "/",
-    url: url_GetReposOwnerRepoCollaborators_754680, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoCollaborators_754680, schemes: {Scheme.Https})
 type
   Call_PutReposOwnerRepoCollaboratorsUser_754699 = ref object of OpenApiRestCall_753573
 proc url_PutReposOwnerRepoCollaboratorsUser_754701(protocol: Scheme; host: string;
@@ -6097,7 +6059,7 @@ proc url_PutReposOwnerRepoCollaboratorsUser_754701(protocol: Scheme; host: strin
 
 proc validate_PutReposOwnerRepoCollaboratorsUser_754700(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Add collaborator.
   ## 
   var section: JsonNode
@@ -6153,9 +6115,9 @@ proc call*(call_754706: Call_PutReposOwnerRepoCollaboratorsUser_754699;
   let scheme = call_754706.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754706.url(scheme.get, call_754706.host, call_754706.base,
-                         call_754706.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754706.makeUrl(scheme.get, call_754706.host, call_754706.base,
+                             call_754706.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754706, uri, valid, _)
 
 proc call*(call_754707: Call_PutReposOwnerRepoCollaboratorsUser_754699;
@@ -6182,7 +6144,8 @@ var putReposOwnerRepoCollaboratorsUser* = Call_PutReposOwnerRepoCollaboratorsUse
     name: "putReposOwnerRepoCollaboratorsUser", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/repos/{owner}/{repo}/collaborators/{user}",
     validator: validate_PutReposOwnerRepoCollaboratorsUser_754700, base: "/",
-    url: url_PutReposOwnerRepoCollaboratorsUser_754701, schemes: {Scheme.Https})
+    makeUrl: url_PutReposOwnerRepoCollaboratorsUser_754701,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCollaboratorsUser_754688 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoCollaboratorsUser_754690(protocol: Scheme; host: string;
@@ -6213,7 +6176,7 @@ proc url_GetReposOwnerRepoCollaboratorsUser_754690(protocol: Scheme; host: strin
 
 proc validate_GetReposOwnerRepoCollaboratorsUser_754689(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Check if user is a collaborator
   ## 
   var section: JsonNode
@@ -6269,9 +6232,9 @@ proc call*(call_754695: Call_GetReposOwnerRepoCollaboratorsUser_754688;
   let scheme = call_754695.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754695.url(scheme.get, call_754695.host, call_754695.base,
-                         call_754695.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754695.makeUrl(scheme.get, call_754695.host, call_754695.base,
+                             call_754695.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754695, uri, valid, _)
 
 proc call*(call_754696: Call_GetReposOwnerRepoCollaboratorsUser_754688;
@@ -6298,7 +6261,8 @@ var getReposOwnerRepoCollaboratorsUser* = Call_GetReposOwnerRepoCollaboratorsUse
     name: "getReposOwnerRepoCollaboratorsUser", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/collaborators/{user}",
     validator: validate_GetReposOwnerRepoCollaboratorsUser_754689, base: "/",
-    url: url_GetReposOwnerRepoCollaboratorsUser_754690, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoCollaboratorsUser_754690,
+    schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoCollaboratorsUser_754710 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoCollaboratorsUser_754712(protocol: Scheme;
@@ -6329,7 +6293,7 @@ proc url_DeleteReposOwnerRepoCollaboratorsUser_754712(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoCollaboratorsUser_754711(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Remove collaborator.
   ## 
   var section: JsonNode
@@ -6385,9 +6349,9 @@ proc call*(call_754717: Call_DeleteReposOwnerRepoCollaboratorsUser_754710;
   let scheme = call_754717.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754717.url(scheme.get, call_754717.host, call_754717.base,
-                         call_754717.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754717.makeUrl(scheme.get, call_754717.host, call_754717.base,
+                             call_754717.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754717, uri, valid, _)
 
 proc call*(call_754718: Call_DeleteReposOwnerRepoCollaboratorsUser_754710;
@@ -6414,7 +6378,8 @@ var deleteReposOwnerRepoCollaboratorsUser* = Call_DeleteReposOwnerRepoCollaborat
     name: "deleteReposOwnerRepoCollaboratorsUser", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/collaborators/{user}",
     validator: validate_DeleteReposOwnerRepoCollaboratorsUser_754711, base: "/",
-    url: url_DeleteReposOwnerRepoCollaboratorsUser_754712, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoCollaboratorsUser_754712,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoComments_754721 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoComments_754723(protocol: Scheme; host: string;
@@ -6442,8 +6407,7 @@ proc url_GetReposOwnerRepoComments_754723(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoComments_754722(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List commit comments for a repository.
   ## Comments are ordered by ascending ID.
   ## 
@@ -6496,9 +6460,9 @@ proc call*(call_754727: Call_GetReposOwnerRepoComments_754721;
   let scheme = call_754727.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754727.url(scheme.get, call_754727.host, call_754727.base,
-                         call_754727.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754727.makeUrl(scheme.get, call_754727.host, call_754727.base,
+                             call_754727.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754727, uri, valid, _)
 
 proc call*(call_754728: Call_GetReposOwnerRepoComments_754721; repo: string;
@@ -6524,7 +6488,7 @@ var getReposOwnerRepoComments* = Call_GetReposOwnerRepoComments_754721(
     name: "getReposOwnerRepoComments", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/comments",
     validator: validate_GetReposOwnerRepoComments_754722, base: "/",
-    url: url_GetReposOwnerRepoComments_754723, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoComments_754723, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCommentsCommentId_754731 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoCommentsCommentId_754733(protocol: Scheme; host: string;
@@ -6555,7 +6519,7 @@ proc url_GetReposOwnerRepoCommentsCommentId_754733(protocol: Scheme; host: strin
 
 proc validate_GetReposOwnerRepoCommentsCommentId_754732(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a single commit comment.
   ## 
   var section: JsonNode
@@ -6610,9 +6574,9 @@ proc call*(call_754738: Call_GetReposOwnerRepoCommentsCommentId_754731;
   let scheme = call_754738.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754738.url(scheme.get, call_754738.host, call_754738.base,
-                         call_754738.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754738.makeUrl(scheme.get, call_754738.host, call_754738.base,
+                             call_754738.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754738, uri, valid, _)
 
 proc call*(call_754739: Call_GetReposOwnerRepoCommentsCommentId_754731;
@@ -6639,7 +6603,8 @@ var getReposOwnerRepoCommentsCommentId* = Call_GetReposOwnerRepoCommentsCommentI
     name: "getReposOwnerRepoCommentsCommentId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/comments/{commentId}",
     validator: validate_GetReposOwnerRepoCommentsCommentId_754732, base: "/",
-    url: url_GetReposOwnerRepoCommentsCommentId_754733, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoCommentsCommentId_754733,
+    schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoCommentsCommentId_754753 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoCommentsCommentId_754755(protocol: Scheme;
@@ -6670,7 +6635,7 @@ proc url_PatchReposOwnerRepoCommentsCommentId_754755(protocol: Scheme;
 
 proc validate_PatchReposOwnerRepoCommentsCommentId_754754(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Update a commit comment.
   ## 
   var section: JsonNode
@@ -6729,9 +6694,9 @@ proc call*(call_754761: Call_PatchReposOwnerRepoCommentsCommentId_754753;
   let scheme = call_754761.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754761.url(scheme.get, call_754761.host, call_754761.base,
-                         call_754761.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754761.makeUrl(scheme.get, call_754761.host, call_754761.base,
+                             call_754761.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754761, uri, valid, _)
 
 proc call*(call_754762: Call_PatchReposOwnerRepoCommentsCommentId_754753;
@@ -6763,7 +6728,8 @@ var patchReposOwnerRepoCommentsCommentId* = Call_PatchReposOwnerRepoCommentsComm
     name: "patchReposOwnerRepoCommentsCommentId", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/comments/{commentId}",
     validator: validate_PatchReposOwnerRepoCommentsCommentId_754754, base: "/",
-    url: url_PatchReposOwnerRepoCommentsCommentId_754755, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoCommentsCommentId_754755,
+    schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoCommentsCommentId_754742 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoCommentsCommentId_754744(protocol: Scheme;
@@ -6794,7 +6760,7 @@ proc url_DeleteReposOwnerRepoCommentsCommentId_754744(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoCommentsCommentId_754743(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a commit comment
   ## 
   var section: JsonNode
@@ -6849,9 +6815,9 @@ proc call*(call_754749: Call_DeleteReposOwnerRepoCommentsCommentId_754742;
   let scheme = call_754749.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754749.url(scheme.get, call_754749.host, call_754749.base,
-                         call_754749.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754749.makeUrl(scheme.get, call_754749.host, call_754749.base,
+                             call_754749.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754749, uri, valid, _)
 
 proc call*(call_754750: Call_DeleteReposOwnerRepoCommentsCommentId_754742;
@@ -6878,7 +6844,8 @@ var deleteReposOwnerRepoCommentsCommentId* = Call_DeleteReposOwnerRepoCommentsCo
     name: "deleteReposOwnerRepoCommentsCommentId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/comments/{commentId}",
     validator: validate_DeleteReposOwnerRepoCommentsCommentId_754743, base: "/",
-    url: url_DeleteReposOwnerRepoCommentsCommentId_754744, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoCommentsCommentId_754744,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCommits_754766 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoCommits_754768(protocol: Scheme; host: string;
@@ -6907,8 +6874,7 @@ proc url_GetReposOwnerRepoCommits_754768(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoCommits_754767(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List commits on a repository.
   ## 
   var section: JsonNode
@@ -6995,9 +6961,9 @@ proc call*(call_754777: Call_GetReposOwnerRepoCommits_754766; path: JsonNode = n
   let scheme = call_754777.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754777.url(scheme.get, call_754777.host, call_754777.base,
-                         call_754777.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754777.makeUrl(scheme.get, call_754777.host, call_754777.base,
+                             call_754777.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754777, uri, valid, _)
 
 proc call*(call_754778: Call_GetReposOwnerRepoCommits_754766; repo: string;
@@ -7040,7 +7006,7 @@ var getReposOwnerRepoCommits* = Call_GetReposOwnerRepoCommits_754766(
     name: "getReposOwnerRepoCommits", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/commits",
     validator: validate_GetReposOwnerRepoCommits_754767, base: "/",
-    url: url_GetReposOwnerRepoCommits_754768, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoCommits_754768, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCommitsRefStatus_754782 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoCommitsRefStatus_754784(protocol: Scheme; host: string;
@@ -7072,7 +7038,7 @@ proc url_GetReposOwnerRepoCommitsRefStatus_754784(protocol: Scheme; host: string
 
 proc validate_GetReposOwnerRepoCommitsRefStatus_754783(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get the combined Status for a specific Ref
   ## The Combined status endpoint is currently available for developers to preview. During the preview period, the API may change without advance notice. Please see the blog post for full details.
   ## To access this endpoint during the preview period, you must provide a custom media type in the Accept header:
@@ -7135,9 +7101,9 @@ proc call*(call_754789: Call_GetReposOwnerRepoCommitsRefStatus_754782;
   let scheme = call_754789.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754789.url(scheme.get, call_754789.host, call_754789.base,
-                         call_754789.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754789.makeUrl(scheme.get, call_754789.host, call_754789.base,
+                             call_754789.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754789, uri, valid, _)
 
 proc call*(call_754790: Call_GetReposOwnerRepoCommitsRefStatus_754782;
@@ -7167,7 +7133,7 @@ var getReposOwnerRepoCommitsRefStatus* = Call_GetReposOwnerRepoCommitsRefStatus_
     name: "getReposOwnerRepoCommitsRefStatus", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/commits/{ref}/status",
     validator: validate_GetReposOwnerRepoCommitsRefStatus_754783, base: "/",
-    url: url_GetReposOwnerRepoCommitsRefStatus_754784, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoCommitsRefStatus_754784, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCommitsShaCode_754793 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoCommitsShaCode_754795(protocol: Scheme; host: string;
@@ -7198,7 +7164,7 @@ proc url_GetReposOwnerRepoCommitsShaCode_754795(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoCommitsShaCode_754794(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a single commit.
   ## 
   var section: JsonNode
@@ -7254,9 +7220,9 @@ proc call*(call_754800: Call_GetReposOwnerRepoCommitsShaCode_754793;
   let scheme = call_754800.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754800.url(scheme.get, call_754800.host, call_754800.base,
-                         call_754800.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754800.makeUrl(scheme.get, call_754800.host, call_754800.base,
+                             call_754800.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754800, uri, valid, _)
 
 proc call*(call_754801: Call_GetReposOwnerRepoCommitsShaCode_754793;
@@ -7283,7 +7249,7 @@ var getReposOwnerRepoCommitsShaCode* = Call_GetReposOwnerRepoCommitsShaCode_7547
     name: "getReposOwnerRepoCommitsShaCode", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/commits/{shaCode}",
     validator: validate_GetReposOwnerRepoCommitsShaCode_754794, base: "/",
-    url: url_GetReposOwnerRepoCommitsShaCode_754795, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoCommitsShaCode_754795, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoCommitsShaCodeComments_754815 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoCommitsShaCodeComments_754817(protocol: Scheme;
@@ -7315,7 +7281,7 @@ proc url_PostReposOwnerRepoCommitsShaCodeComments_754817(protocol: Scheme;
 
 proc validate_PostReposOwnerRepoCommitsShaCodeComments_754816(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Create a commit comment.
   ## 
   var section: JsonNode
@@ -7375,9 +7341,9 @@ proc call*(call_754823: Call_PostReposOwnerRepoCommitsShaCodeComments_754815;
   let scheme = call_754823.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754823.url(scheme.get, call_754823.host, call_754823.base,
-                         call_754823.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754823.makeUrl(scheme.get, call_754823.host, call_754823.base,
+                             call_754823.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754823, uri, valid, _)
 
 proc call*(call_754824: Call_PostReposOwnerRepoCommitsShaCodeComments_754815;
@@ -7410,7 +7376,7 @@ var postReposOwnerRepoCommitsShaCodeComments* = Call_PostReposOwnerRepoCommitsSh
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/commits/{shaCode}/comments",
     validator: validate_PostReposOwnerRepoCommitsShaCodeComments_754816,
-    base: "/", url: url_PostReposOwnerRepoCommitsShaCodeComments_754817,
+    base: "/", makeUrl: url_PostReposOwnerRepoCommitsShaCodeComments_754817,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCommitsShaCodeComments_754804 = ref object of OpenApiRestCall_753573
@@ -7443,7 +7409,7 @@ proc url_GetReposOwnerRepoCommitsShaCodeComments_754806(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoCommitsShaCodeComments_754805(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List comments for a single commitList comments for a single commit.
   ## 
   var section: JsonNode
@@ -7499,9 +7465,9 @@ proc call*(call_754811: Call_GetReposOwnerRepoCommitsShaCodeComments_754804;
   let scheme = call_754811.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754811.url(scheme.get, call_754811.host, call_754811.base,
-                         call_754811.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754811.makeUrl(scheme.get, call_754811.host, call_754811.base,
+                             call_754811.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754811, uri, valid, _)
 
 proc call*(call_754812: Call_GetReposOwnerRepoCommitsShaCodeComments_754804;
@@ -7529,7 +7495,7 @@ var getReposOwnerRepoCommitsShaCodeComments* = Call_GetReposOwnerRepoCommitsShaC
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/commits/{shaCode}/comments",
     validator: validate_GetReposOwnerRepoCommitsShaCodeComments_754805, base: "/",
-    url: url_GetReposOwnerRepoCommitsShaCodeComments_754806,
+    makeUrl: url_GetReposOwnerRepoCommitsShaCodeComments_754806,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoCompareBaseIdHeadId_754828 = ref object of OpenApiRestCall_753573
@@ -7564,7 +7530,7 @@ proc url_GetReposOwnerRepoCompareBaseIdHeadId_754830(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoCompareBaseIdHeadId_754829(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Compare two commits
   ## 
   var section: JsonNode
@@ -7625,9 +7591,9 @@ proc call*(call_754836: Call_GetReposOwnerRepoCompareBaseIdHeadId_754828;
   let scheme = call_754836.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754836.url(scheme.get, call_754836.host, call_754836.base,
-                         call_754836.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754836.makeUrl(scheme.get, call_754836.host, call_754836.base,
+                             call_754836.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754836, uri, valid, _)
 
 proc call*(call_754837: Call_GetReposOwnerRepoCompareBaseIdHeadId_754828;
@@ -7657,7 +7623,8 @@ var getReposOwnerRepoCompareBaseIdHeadId* = Call_GetReposOwnerRepoCompareBaseIdH
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/compare/{baseId}...{headId}",
     validator: validate_GetReposOwnerRepoCompareBaseIdHeadId_754829, base: "/",
-    url: url_GetReposOwnerRepoCompareBaseIdHeadId_754830, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoCompareBaseIdHeadId_754830,
+    schemes: {Scheme.Https})
 type
   Call_PutReposOwnerRepoContentsPath_754854 = ref object of OpenApiRestCall_753573
 proc url_PutReposOwnerRepoContentsPath_754856(protocol: Scheme; host: string;
@@ -7687,8 +7654,7 @@ proc url_PutReposOwnerRepoContentsPath_754856(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PutReposOwnerRepoContentsPath_754855(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a file.
   ## 
   var section: JsonNode
@@ -7747,9 +7713,9 @@ proc call*(call_754862: Call_PutReposOwnerRepoContentsPath_754854;
   let scheme = call_754862.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754862.url(scheme.get, call_754862.host, call_754862.base,
-                         call_754862.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754862.makeUrl(scheme.get, call_754862.host, call_754862.base,
+                             call_754862.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754862, uri, valid, _)
 
 proc call*(call_754863: Call_PutReposOwnerRepoContentsPath_754854; path: string;
@@ -7779,7 +7745,7 @@ var putReposOwnerRepoContentsPath* = Call_PutReposOwnerRepoContentsPath_754854(
     name: "putReposOwnerRepoContentsPath", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/repos/{owner}/{repo}/contents/{path}",
     validator: validate_PutReposOwnerRepoContentsPath_754855, base: "/",
-    url: url_PutReposOwnerRepoContentsPath_754856, schemes: {Scheme.Https})
+    makeUrl: url_PutReposOwnerRepoContentsPath_754856, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoContentsPath_754840 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoContentsPath_754842(protocol: Scheme; host: string;
@@ -7809,8 +7775,7 @@ proc url_GetReposOwnerRepoContentsPath_754842(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoContentsPath_754841(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get contents.
   ## This method returns the contents of a file or directory in a repository.
   ## Files and symlinks support a custom media type for getting the raw content.
@@ -7892,16 +7857,16 @@ proc call*(call_754849: Call_GetReposOwnerRepoContentsPath_754840;
   let scheme = call_754849.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754849.url(scheme.get, call_754849.host, call_754849.base,
-                         call_754849.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754849.makeUrl(scheme.get, call_754849.host, call_754849.base,
+                             call_754849.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754849, uri, valid, _)
 
 var getReposOwnerRepoContentsPath* = Call_GetReposOwnerRepoContentsPath_754840(
     name: "getReposOwnerRepoContentsPath", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/contents/{path}",
     validator: validate_GetReposOwnerRepoContentsPath_754841, base: "/",
-    url: url_GetReposOwnerRepoContentsPath_754842, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoContentsPath_754842, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoContentsPath_754867 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoContentsPath_754869(protocol: Scheme; host: string;
@@ -7932,7 +7897,7 @@ proc url_DeleteReposOwnerRepoContentsPath_754869(protocol: Scheme; host: string;
 
 proc validate_DeleteReposOwnerRepoContentsPath_754868(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a file.
   ## This method deletes a file in a repository.
   ## 
@@ -7995,9 +7960,9 @@ proc call*(call_754875: Call_DeleteReposOwnerRepoContentsPath_754867;
   let scheme = call_754875.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754875.url(scheme.get, call_754875.host, call_754875.base,
-                         call_754875.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754875.makeUrl(scheme.get, call_754875.host, call_754875.base,
+                             call_754875.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754875, uri, valid, _)
 
 proc call*(call_754876: Call_DeleteReposOwnerRepoContentsPath_754867; path: string;
@@ -8029,7 +7994,7 @@ var deleteReposOwnerRepoContentsPath* = Call_DeleteReposOwnerRepoContentsPath_75
     name: "deleteReposOwnerRepoContentsPath", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/contents/{path}",
     validator: validate_DeleteReposOwnerRepoContentsPath_754868, base: "/",
-    url: url_DeleteReposOwnerRepoContentsPath_754869, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoContentsPath_754869, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoContributors_754880 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoContributors_754882(protocol: Scheme; host: string;
@@ -8057,8 +8022,7 @@ proc url_GetReposOwnerRepoContributors_754882(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoContributors_754881(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get list of contributors.
   ## 
   var section: JsonNode
@@ -8116,9 +8080,9 @@ proc call*(call_754887: Call_GetReposOwnerRepoContributors_754880;
   let scheme = call_754887.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754887.url(scheme.get, call_754887.host, call_754887.base,
-                         call_754887.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754887.makeUrl(scheme.get, call_754887.host, call_754887.base,
+                             call_754887.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754887, uri, valid, _)
 
 proc call*(call_754888: Call_GetReposOwnerRepoContributors_754880; repo: string;
@@ -8146,7 +8110,7 @@ var getReposOwnerRepoContributors* = Call_GetReposOwnerRepoContributors_754880(
     name: "getReposOwnerRepoContributors", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/contributors",
     validator: validate_GetReposOwnerRepoContributors_754881, base: "/",
-    url: url_GetReposOwnerRepoContributors_754882, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoContributors_754882, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoDeployments_754902 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoDeployments_754904(protocol: Scheme; host: string;
@@ -8174,8 +8138,7 @@ proc url_PostReposOwnerRepoDeployments_754904(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoDeployments_754903(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Users with push access can create a deployment for a given ref
   ## 
   var section: JsonNode
@@ -8228,9 +8191,9 @@ proc call*(call_754909: Call_PostReposOwnerRepoDeployments_754902;
   let scheme = call_754909.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754909.url(scheme.get, call_754909.host, call_754909.base,
-                         call_754909.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754909.makeUrl(scheme.get, call_754909.host, call_754909.base,
+                             call_754909.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754909, uri, valid, _)
 
 proc call*(call_754910: Call_PostReposOwnerRepoDeployments_754902; repo: string;
@@ -8258,7 +8221,7 @@ var postReposOwnerRepoDeployments* = Call_PostReposOwnerRepoDeployments_754902(
     name: "postReposOwnerRepoDeployments", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/deployments",
     validator: validate_PostReposOwnerRepoDeployments_754903, base: "/",
-    url: url_PostReposOwnerRepoDeployments_754904, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoDeployments_754904, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoDeployments_754892 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoDeployments_754894(protocol: Scheme; host: string;
@@ -8286,8 +8249,7 @@ proc url_GetReposOwnerRepoDeployments_754894(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoDeployments_754893(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Users with pull access can view deployments for a repository
   ## 
   var section: JsonNode
@@ -8336,9 +8298,9 @@ proc call*(call_754898: Call_GetReposOwnerRepoDeployments_754892;
   let scheme = call_754898.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754898.url(scheme.get, call_754898.host, call_754898.base,
-                         call_754898.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754898.makeUrl(scheme.get, call_754898.host, call_754898.base,
+                             call_754898.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754898, uri, valid, _)
 
 proc call*(call_754899: Call_GetReposOwnerRepoDeployments_754892; repo: string;
@@ -8362,7 +8324,7 @@ var getReposOwnerRepoDeployments* = Call_GetReposOwnerRepoDeployments_754892(
     name: "getReposOwnerRepoDeployments", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/deployments",
     validator: validate_GetReposOwnerRepoDeployments_754893, base: "/",
-    url: url_GetReposOwnerRepoDeployments_754894, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoDeployments_754894, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoDeploymentsIdStatuses_754925 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoDeploymentsIdStatuses_754927(protocol: Scheme;
@@ -8394,7 +8356,7 @@ proc url_PostReposOwnerRepoDeploymentsIdStatuses_754927(protocol: Scheme;
 
 proc validate_PostReposOwnerRepoDeploymentsIdStatuses_754926(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Create a Deployment Status
   ## Users with push access can create deployment statuses for a given deployment:
   ## 
@@ -8457,9 +8419,9 @@ proc call*(call_754933: Call_PostReposOwnerRepoDeploymentsIdStatuses_754925;
   let scheme = call_754933.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754933.url(scheme.get, call_754933.host, call_754933.base,
-                         call_754933.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754933.makeUrl(scheme.get, call_754933.host, call_754933.base,
+                             call_754933.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754933, uri, valid, _)
 
 proc call*(call_754934: Call_PostReposOwnerRepoDeploymentsIdStatuses_754925;
@@ -8493,7 +8455,7 @@ var postReposOwnerRepoDeploymentsIdStatuses* = Call_PostReposOwnerRepoDeployment
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/deployments/{id}/statuses",
     validator: validate_PostReposOwnerRepoDeploymentsIdStatuses_754926, base: "/",
-    url: url_PostReposOwnerRepoDeploymentsIdStatuses_754927,
+    makeUrl: url_PostReposOwnerRepoDeploymentsIdStatuses_754927,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoDeploymentsIdStatuses_754914 = ref object of OpenApiRestCall_753573
@@ -8526,7 +8488,7 @@ proc url_GetReposOwnerRepoDeploymentsIdStatuses_754916(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoDeploymentsIdStatuses_754915(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Users with pull access can view deployment statuses for a deployment
   ## 
   var section: JsonNode
@@ -8581,9 +8543,9 @@ proc call*(call_754921: Call_GetReposOwnerRepoDeploymentsIdStatuses_754914;
   let scheme = call_754921.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754921.url(scheme.get, call_754921.host, call_754921.base,
-                         call_754921.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754921.makeUrl(scheme.get, call_754921.host, call_754921.base,
+                             call_754921.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754921, uri, valid, _)
 
 proc call*(call_754922: Call_GetReposOwnerRepoDeploymentsIdStatuses_754914;
@@ -8611,7 +8573,7 @@ var getReposOwnerRepoDeploymentsIdStatuses* = Call_GetReposOwnerRepoDeploymentsI
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/deployments/{id}/statuses",
     validator: validate_GetReposOwnerRepoDeploymentsIdStatuses_754915, base: "/",
-    url: url_GetReposOwnerRepoDeploymentsIdStatuses_754916,
+    makeUrl: url_GetReposOwnerRepoDeploymentsIdStatuses_754916,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoDownloads_754938 = ref object of OpenApiRestCall_753573
@@ -8640,8 +8602,7 @@ proc url_GetReposOwnerRepoDownloads_754940(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoDownloads_754939(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Deprecated. List downloads for a repository.
   ## 
   var section: JsonNode
@@ -8690,9 +8651,9 @@ proc call*(call_754944: Call_GetReposOwnerRepoDownloads_754938;
   let scheme = call_754944.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754944.url(scheme.get, call_754944.host, call_754944.base,
-                         call_754944.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754944.makeUrl(scheme.get, call_754944.host, call_754944.base,
+                             call_754944.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754944, uri, valid, _)
 
 proc call*(call_754945: Call_GetReposOwnerRepoDownloads_754938; repo: string;
@@ -8716,7 +8677,7 @@ var getReposOwnerRepoDownloads* = Call_GetReposOwnerRepoDownloads_754938(
     name: "getReposOwnerRepoDownloads", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/downloads",
     validator: validate_GetReposOwnerRepoDownloads_754939, base: "/",
-    url: url_GetReposOwnerRepoDownloads_754940, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoDownloads_754940, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoDownloadsDownloadId_754948 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoDownloadsDownloadId_754950(protocol: Scheme;
@@ -8747,7 +8708,7 @@ proc url_GetReposOwnerRepoDownloadsDownloadId_754950(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoDownloadsDownloadId_754949(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Deprecated. Get a single download.
   ## 
   var section: JsonNode
@@ -8803,9 +8764,9 @@ proc call*(call_754955: Call_GetReposOwnerRepoDownloadsDownloadId_754948;
   let scheme = call_754955.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754955.url(scheme.get, call_754955.host, call_754955.base,
-                         call_754955.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754955.makeUrl(scheme.get, call_754955.host, call_754955.base,
+                             call_754955.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754955, uri, valid, _)
 
 proc call*(call_754956: Call_GetReposOwnerRepoDownloadsDownloadId_754948;
@@ -8832,7 +8793,8 @@ var getReposOwnerRepoDownloadsDownloadId* = Call_GetReposOwnerRepoDownloadsDownl
     name: "getReposOwnerRepoDownloadsDownloadId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/downloads/{downloadId}",
     validator: validate_GetReposOwnerRepoDownloadsDownloadId_754949, base: "/",
-    url: url_GetReposOwnerRepoDownloadsDownloadId_754950, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoDownloadsDownloadId_754950,
+    schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoDownloadsDownloadId_754959 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoDownloadsDownloadId_754961(protocol: Scheme;
@@ -8863,7 +8825,7 @@ proc url_DeleteReposOwnerRepoDownloadsDownloadId_754961(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoDownloadsDownloadId_754960(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Deprecated. Delete a download.
   ## 
   var section: JsonNode
@@ -8919,9 +8881,9 @@ proc call*(call_754966: Call_DeleteReposOwnerRepoDownloadsDownloadId_754959;
   let scheme = call_754966.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754966.url(scheme.get, call_754966.host, call_754966.base,
-                         call_754966.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754966.makeUrl(scheme.get, call_754966.host, call_754966.base,
+                             call_754966.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754966, uri, valid, _)
 
 proc call*(call_754967: Call_DeleteReposOwnerRepoDownloadsDownloadId_754959;
@@ -8948,7 +8910,7 @@ var deleteReposOwnerRepoDownloadsDownloadId* = Call_DeleteReposOwnerRepoDownload
     name: "deleteReposOwnerRepoDownloadsDownloadId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/downloads/{downloadId}",
     validator: validate_DeleteReposOwnerRepoDownloadsDownloadId_754960, base: "/",
-    url: url_DeleteReposOwnerRepoDownloadsDownloadId_754961,
+    makeUrl: url_DeleteReposOwnerRepoDownloadsDownloadId_754961,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoEvents_754970 = ref object of OpenApiRestCall_753573
@@ -8978,8 +8940,7 @@ proc url_GetReposOwnerRepoEvents_754972(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoEvents_754971(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get list of repository events.
   ## 
   var section: JsonNode
@@ -9028,9 +8989,9 @@ proc call*(call_754976: Call_GetReposOwnerRepoEvents_754970; path: JsonNode = ni
   let scheme = call_754976.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754976.url(scheme.get, call_754976.host, call_754976.base,
-                         call_754976.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754976.makeUrl(scheme.get, call_754976.host, call_754976.base,
+                             call_754976.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754976, uri, valid, _)
 
 proc call*(call_754977: Call_GetReposOwnerRepoEvents_754970; repo: string;
@@ -9054,7 +9015,7 @@ var getReposOwnerRepoEvents* = Call_GetReposOwnerRepoEvents_754970(
     name: "getReposOwnerRepoEvents", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/events",
     validator: validate_GetReposOwnerRepoEvents_754971, base: "/",
-    url: url_GetReposOwnerRepoEvents_754972, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoEvents_754972, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoForks_754992 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoForks_754994(protocol: Scheme; host: string; base: string;
@@ -9083,8 +9044,7 @@ proc url_PostReposOwnerRepoForks_754994(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoForks_754993(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a fork.
   ## Forking a Repository happens asynchronously. Therefore, you may have to wai
   ## a short period before accessing the git objects. If this takes longer than 5
@@ -9145,9 +9105,9 @@ proc call*(call_754999: Call_PostReposOwnerRepoForks_754992; path: JsonNode = ni
   let scheme = call_754999.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754999.url(scheme.get, call_754999.host, call_754999.base,
-                         call_754999.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754999.makeUrl(scheme.get, call_754999.host, call_754999.base,
+                             call_754999.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754999, uri, valid, _)
 
 proc call*(call_755000: Call_PostReposOwnerRepoForks_754992; repo: string;
@@ -9179,7 +9139,7 @@ var postReposOwnerRepoForks* = Call_PostReposOwnerRepoForks_754992(
     name: "postReposOwnerRepoForks", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/forks",
     validator: validate_PostReposOwnerRepoForks_754993, base: "/",
-    url: url_PostReposOwnerRepoForks_754994, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoForks_754994, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoForks_754980 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoForks_754982(protocol: Scheme; host: string; base: string;
@@ -9207,8 +9167,7 @@ proc url_GetReposOwnerRepoForks_754982(protocol: Scheme; host: string; base: str
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoForks_754981(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List forks.
   ## 
   var section: JsonNode
@@ -9264,9 +9223,9 @@ proc call*(call_754987: Call_GetReposOwnerRepoForks_754980; path: JsonNode = nil
   let scheme = call_754987.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_754987.url(scheme.get, call_754987.host, call_754987.base,
-                         call_754987.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_754987.makeUrl(scheme.get, call_754987.host, call_754987.base,
+                             call_754987.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_754987, uri, valid, _)
 
 proc call*(call_754988: Call_GetReposOwnerRepoForks_754980; repo: string;
@@ -9293,7 +9252,7 @@ var getReposOwnerRepoForks* = Call_GetReposOwnerRepoForks_754980(
     name: "getReposOwnerRepoForks", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/forks",
     validator: validate_GetReposOwnerRepoForks_754981, base: "/",
-    url: url_GetReposOwnerRepoForks_754982, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoForks_754982, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoGitBlobs_755004 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoGitBlobs_755006(protocol: Scheme; host: string;
@@ -9321,8 +9280,7 @@ proc url_PostReposOwnerRepoGitBlobs_755006(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoGitBlobs_755005(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a Blob.
   ## 
   var section: JsonNode
@@ -9375,9 +9333,9 @@ proc call*(call_755011: Call_PostReposOwnerRepoGitBlobs_755004;
   let scheme = call_755011.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755011.url(scheme.get, call_755011.host, call_755011.base,
-                         call_755011.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755011.makeUrl(scheme.get, call_755011.host, call_755011.base,
+                             call_755011.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755011, uri, valid, _)
 
 proc call*(call_755012: Call_PostReposOwnerRepoGitBlobs_755004; repo: string;
@@ -9405,7 +9363,7 @@ var postReposOwnerRepoGitBlobs* = Call_PostReposOwnerRepoGitBlobs_755004(
     name: "postReposOwnerRepoGitBlobs", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/blobs",
     validator: validate_PostReposOwnerRepoGitBlobs_755005, base: "/",
-    url: url_PostReposOwnerRepoGitBlobs_755006, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoGitBlobs_755006, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoGitBlobsShaCode_755016 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoGitBlobsShaCode_755018(protocol: Scheme; host: string;
@@ -9436,7 +9394,7 @@ proc url_GetReposOwnerRepoGitBlobsShaCode_755018(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoGitBlobsShaCode_755017(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a Blob.
   ## Since blobs can be any arbitrary binary data, the input and responses for
   ## the blob API takes an encoding parameter that can be either utf-8 or
@@ -9502,9 +9460,9 @@ proc call*(call_755023: Call_GetReposOwnerRepoGitBlobsShaCode_755016;
   let scheme = call_755023.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755023.url(scheme.get, call_755023.host, call_755023.base,
-                         call_755023.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755023.makeUrl(scheme.get, call_755023.host, call_755023.base,
+                             call_755023.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755023, uri, valid, _)
 
 proc call*(call_755024: Call_GetReposOwnerRepoGitBlobsShaCode_755016;
@@ -9536,7 +9494,7 @@ var getReposOwnerRepoGitBlobsShaCode* = Call_GetReposOwnerRepoGitBlobsShaCode_75
     name: "getReposOwnerRepoGitBlobsShaCode", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/blobs/{shaCode}",
     validator: validate_GetReposOwnerRepoGitBlobsShaCode_755017, base: "/",
-    url: url_GetReposOwnerRepoGitBlobsShaCode_755018, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoGitBlobsShaCode_755018, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoGitCommits_755027 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoGitCommits_755029(protocol: Scheme; host: string;
@@ -9564,8 +9522,7 @@ proc url_PostReposOwnerRepoGitCommits_755029(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoGitCommits_755028(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a Commit.
   ## 
   var section: JsonNode
@@ -9618,9 +9575,9 @@ proc call*(call_755034: Call_PostReposOwnerRepoGitCommits_755027;
   let scheme = call_755034.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755034.url(scheme.get, call_755034.host, call_755034.base,
-                         call_755034.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755034.makeUrl(scheme.get, call_755034.host, call_755034.base,
+                             call_755034.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755034, uri, valid, _)
 
 proc call*(call_755035: Call_PostReposOwnerRepoGitCommits_755027; repo: string;
@@ -9648,7 +9605,7 @@ var postReposOwnerRepoGitCommits* = Call_PostReposOwnerRepoGitCommits_755027(
     name: "postReposOwnerRepoGitCommits", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/commits",
     validator: validate_PostReposOwnerRepoGitCommits_755028, base: "/",
-    url: url_PostReposOwnerRepoGitCommits_755029, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoGitCommits_755029, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoGitCommitsShaCode_755039 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoGitCommitsShaCode_755041(protocol: Scheme; host: string;
@@ -9679,7 +9636,7 @@ proc url_GetReposOwnerRepoGitCommitsShaCode_755041(protocol: Scheme; host: strin
 
 proc validate_GetReposOwnerRepoGitCommitsShaCode_755040(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a Commit.
   ## 
   var section: JsonNode
@@ -9735,9 +9692,9 @@ proc call*(call_755046: Call_GetReposOwnerRepoGitCommitsShaCode_755039;
   let scheme = call_755046.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755046.url(scheme.get, call_755046.host, call_755046.base,
-                         call_755046.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755046.makeUrl(scheme.get, call_755046.host, call_755046.base,
+                             call_755046.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755046, uri, valid, _)
 
 proc call*(call_755047: Call_GetReposOwnerRepoGitCommitsShaCode_755039;
@@ -9764,7 +9721,8 @@ var getReposOwnerRepoGitCommitsShaCode* = Call_GetReposOwnerRepoGitCommitsShaCod
     name: "getReposOwnerRepoGitCommitsShaCode", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/commits/{shaCode}",
     validator: validate_GetReposOwnerRepoGitCommitsShaCode_755040, base: "/",
-    url: url_GetReposOwnerRepoGitCommitsShaCode_755041, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoGitCommitsShaCode_755041,
+    schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoGitRefs_755060 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoGitRefs_755062(protocol: Scheme; host: string;
@@ -9792,8 +9750,7 @@ proc url_PostReposOwnerRepoGitRefs_755062(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoGitRefs_755061(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a Reference
   ## 
   var section: JsonNode
@@ -9846,9 +9803,9 @@ proc call*(call_755067: Call_PostReposOwnerRepoGitRefs_755060;
   let scheme = call_755067.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755067.url(scheme.get, call_755067.host, call_755067.base,
-                         call_755067.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755067.makeUrl(scheme.get, call_755067.host, call_755067.base,
+                             call_755067.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755067, uri, valid, _)
 
 proc call*(call_755068: Call_PostReposOwnerRepoGitRefs_755060; repo: string;
@@ -9876,7 +9833,7 @@ var postReposOwnerRepoGitRefs* = Call_PostReposOwnerRepoGitRefs_755060(
     name: "postReposOwnerRepoGitRefs", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/refs",
     validator: validate_PostReposOwnerRepoGitRefs_755061, base: "/",
-    url: url_PostReposOwnerRepoGitRefs_755062, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoGitRefs_755062, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoGitRefs_755050 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoGitRefs_755052(protocol: Scheme; host: string;
@@ -9905,8 +9862,7 @@ proc url_GetReposOwnerRepoGitRefs_755052(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoGitRefs_755051(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get all References
   ## 
   var section: JsonNode
@@ -9955,9 +9911,9 @@ proc call*(call_755056: Call_GetReposOwnerRepoGitRefs_755050; path: JsonNode = n
   let scheme = call_755056.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755056.url(scheme.get, call_755056.host, call_755056.base,
-                         call_755056.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755056.makeUrl(scheme.get, call_755056.host, call_755056.base,
+                             call_755056.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755056, uri, valid, _)
 
 proc call*(call_755057: Call_GetReposOwnerRepoGitRefs_755050; repo: string;
@@ -9981,7 +9937,7 @@ var getReposOwnerRepoGitRefs* = Call_GetReposOwnerRepoGitRefs_755050(
     name: "getReposOwnerRepoGitRefs", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/refs",
     validator: validate_GetReposOwnerRepoGitRefs_755051, base: "/",
-    url: url_GetReposOwnerRepoGitRefs_755052, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoGitRefs_755052, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoGitRefsRef_755072 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoGitRefsRef_755074(protocol: Scheme; host: string;
@@ -10011,8 +9967,7 @@ proc url_GetReposOwnerRepoGitRefsRef_755074(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoGitRefsRef_755073(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a Reference
   ## 
   var section: JsonNode
@@ -10067,9 +10022,9 @@ proc call*(call_755079: Call_GetReposOwnerRepoGitRefsRef_755072;
   let scheme = call_755079.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755079.url(scheme.get, call_755079.host, call_755079.base,
-                         call_755079.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755079.makeUrl(scheme.get, call_755079.host, call_755079.base,
+                             call_755079.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755079, uri, valid, _)
 
 proc call*(call_755080: Call_GetReposOwnerRepoGitRefsRef_755072; `ref`: string;
@@ -10095,7 +10050,7 @@ var getReposOwnerRepoGitRefsRef* = Call_GetReposOwnerRepoGitRefsRef_755072(
     name: "getReposOwnerRepoGitRefsRef", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/refs/{ref}",
     validator: validate_GetReposOwnerRepoGitRefsRef_755073, base: "/",
-    url: url_GetReposOwnerRepoGitRefsRef_755074, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoGitRefsRef_755074, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoGitRefsRef_755094 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoGitRefsRef_755096(protocol: Scheme; host: string;
@@ -10125,8 +10080,7 @@ proc url_PatchReposOwnerRepoGitRefsRef_755096(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PatchReposOwnerRepoGitRefsRef_755095(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Update a Reference
   ## 
   var section: JsonNode
@@ -10185,9 +10139,9 @@ proc call*(call_755102: Call_PatchReposOwnerRepoGitRefsRef_755094;
   let scheme = call_755102.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755102.url(scheme.get, call_755102.host, call_755102.base,
-                         call_755102.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755102.makeUrl(scheme.get, call_755102.host, call_755102.base,
+                             call_755102.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755102, uri, valid, _)
 
 proc call*(call_755103: Call_PatchReposOwnerRepoGitRefsRef_755094; `ref`: string;
@@ -10217,7 +10171,7 @@ var patchReposOwnerRepoGitRefsRef* = Call_PatchReposOwnerRepoGitRefsRef_755094(
     name: "patchReposOwnerRepoGitRefsRef", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/refs/{ref}",
     validator: validate_PatchReposOwnerRepoGitRefsRef_755095, base: "/",
-    url: url_PatchReposOwnerRepoGitRefsRef_755096, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoGitRefsRef_755096, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoGitRefsRef_755083 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoGitRefsRef_755085(protocol: Scheme; host: string;
@@ -10248,7 +10202,7 @@ proc url_DeleteReposOwnerRepoGitRefsRef_755085(protocol: Scheme; host: string;
 
 proc validate_DeleteReposOwnerRepoGitRefsRef_755084(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a Reference
   ## Example: Deleting a branch: DELETE /repos/octocat/Hello-World/git/refs/heads/feature-a
   ## Example: Deleting a tag:        DELETE /repos/octocat/Hello-World/git/refs/tags/v1.0
@@ -10309,9 +10263,9 @@ proc call*(call_755090: Call_DeleteReposOwnerRepoGitRefsRef_755083;
   let scheme = call_755090.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755090.url(scheme.get, call_755090.host, call_755090.base,
-                         call_755090.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755090.makeUrl(scheme.get, call_755090.host, call_755090.base,
+                             call_755090.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755090, uri, valid, _)
 
 proc call*(call_755091: Call_DeleteReposOwnerRepoGitRefsRef_755083; `ref`: string;
@@ -10340,7 +10294,7 @@ var deleteReposOwnerRepoGitRefsRef* = Call_DeleteReposOwnerRepoGitRefsRef_755083
     name: "deleteReposOwnerRepoGitRefsRef", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/refs/{ref}",
     validator: validate_DeleteReposOwnerRepoGitRefsRef_755084, base: "/",
-    url: url_DeleteReposOwnerRepoGitRefsRef_755085, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoGitRefsRef_755085, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoGitTags_755107 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoGitTags_755109(protocol: Scheme; host: string;
@@ -10368,8 +10322,7 @@ proc url_PostReposOwnerRepoGitTags_755109(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoGitTags_755108(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a Tag Object.
   ## Note that creating a tag object does not create the reference that makes a
   ## tag in Git. If you want to create an annotated tag in Git, you have to do
@@ -10434,9 +10387,9 @@ proc call*(call_755114: Call_PostReposOwnerRepoGitTags_755107;
   let scheme = call_755114.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755114.url(scheme.get, call_755114.host, call_755114.base,
-                         call_755114.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755114.makeUrl(scheme.get, call_755114.host, call_755114.base,
+                             call_755114.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755114, uri, valid, _)
 
 proc call*(call_755115: Call_PostReposOwnerRepoGitTags_755107; repo: string;
@@ -10470,7 +10423,7 @@ var postReposOwnerRepoGitTags* = Call_PostReposOwnerRepoGitTags_755107(
     name: "postReposOwnerRepoGitTags", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/tags",
     validator: validate_PostReposOwnerRepoGitTags_755108, base: "/",
-    url: url_PostReposOwnerRepoGitTags_755109, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoGitTags_755109, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoGitTagsShaCode_755119 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoGitTagsShaCode_755121(protocol: Scheme; host: string;
@@ -10501,7 +10454,7 @@ proc url_GetReposOwnerRepoGitTagsShaCode_755121(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoGitTagsShaCode_755120(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a Tag.
   ## 
   var section: JsonNode
@@ -10556,9 +10509,9 @@ proc call*(call_755126: Call_GetReposOwnerRepoGitTagsShaCode_755119;
   let scheme = call_755126.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755126.url(scheme.get, call_755126.host, call_755126.base,
-                         call_755126.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755126.makeUrl(scheme.get, call_755126.host, call_755126.base,
+                             call_755126.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755126, uri, valid, _)
 
 proc call*(call_755127: Call_GetReposOwnerRepoGitTagsShaCode_755119;
@@ -10584,7 +10537,7 @@ var getReposOwnerRepoGitTagsShaCode* = Call_GetReposOwnerRepoGitTagsShaCode_7551
     name: "getReposOwnerRepoGitTagsShaCode", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/tags/{shaCode}",
     validator: validate_GetReposOwnerRepoGitTagsShaCode_755120, base: "/",
-    url: url_GetReposOwnerRepoGitTagsShaCode_755121, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoGitTagsShaCode_755121, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoGitTrees_755130 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoGitTrees_755132(protocol: Scheme; host: string;
@@ -10612,8 +10565,7 @@ proc url_PostReposOwnerRepoGitTrees_755132(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoGitTrees_755131(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a Tree.
   ## The tree creation API will take nested entries as well. If both a tree and
   ## a nested path modifying that tree are specified, it will overwrite the
@@ -10674,9 +10626,9 @@ proc call*(call_755137: Call_PostReposOwnerRepoGitTrees_755130;
   let scheme = call_755137.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755137.url(scheme.get, call_755137.host, call_755137.base,
-                         call_755137.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755137.makeUrl(scheme.get, call_755137.host, call_755137.base,
+                             call_755137.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755137, uri, valid, _)
 
 proc call*(call_755138: Call_PostReposOwnerRepoGitTrees_755130; repo: string;
@@ -10708,7 +10660,7 @@ var postReposOwnerRepoGitTrees* = Call_PostReposOwnerRepoGitTrees_755130(
     name: "postReposOwnerRepoGitTrees", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/trees",
     validator: validate_PostReposOwnerRepoGitTrees_755131, base: "/",
-    url: url_PostReposOwnerRepoGitTrees_755132, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoGitTrees_755132, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoGitTreesShaCode_755142 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoGitTreesShaCode_755144(protocol: Scheme; host: string;
@@ -10739,7 +10691,7 @@ proc url_GetReposOwnerRepoGitTreesShaCode_755144(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoGitTreesShaCode_755143(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a Tree.
   ## 
   var section: JsonNode
@@ -10802,9 +10754,9 @@ proc call*(call_755150: Call_GetReposOwnerRepoGitTreesShaCode_755142;
   let scheme = call_755150.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755150.url(scheme.get, call_755150.host, call_755150.base,
-                         call_755150.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755150.makeUrl(scheme.get, call_755150.host, call_755150.base,
+                             call_755150.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755150, uri, valid, _)
 
 proc call*(call_755151: Call_GetReposOwnerRepoGitTreesShaCode_755142;
@@ -10836,7 +10788,7 @@ var getReposOwnerRepoGitTreesShaCode* = Call_GetReposOwnerRepoGitTreesShaCode_75
     name: "getReposOwnerRepoGitTreesShaCode", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/git/trees/{shaCode}",
     validator: validate_GetReposOwnerRepoGitTreesShaCode_755143, base: "/",
-    url: url_GetReposOwnerRepoGitTreesShaCode_755144, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoGitTreesShaCode_755144, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoHooks_755165 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoHooks_755167(protocol: Scheme; host: string; base: string;
@@ -10865,8 +10817,7 @@ proc url_PostReposOwnerRepoHooks_755167(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoHooks_755166(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a hook.
   ## 
   var section: JsonNode
@@ -10919,9 +10870,9 @@ proc call*(call_755172: Call_PostReposOwnerRepoHooks_755165; path: JsonNode = ni
   let scheme = call_755172.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755172.url(scheme.get, call_755172.host, call_755172.base,
-                         call_755172.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755172.makeUrl(scheme.get, call_755172.host, call_755172.base,
+                             call_755172.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755172, uri, valid, _)
 
 proc call*(call_755173: Call_PostReposOwnerRepoHooks_755165; repo: string;
@@ -10949,7 +10900,7 @@ var postReposOwnerRepoHooks* = Call_PostReposOwnerRepoHooks_755165(
     name: "postReposOwnerRepoHooks", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/hooks",
     validator: validate_PostReposOwnerRepoHooks_755166, base: "/",
-    url: url_PostReposOwnerRepoHooks_755167, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoHooks_755167, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoHooks_755155 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoHooks_755157(protocol: Scheme; host: string; base: string;
@@ -10977,8 +10928,7 @@ proc url_GetReposOwnerRepoHooks_755157(protocol: Scheme; host: string; base: str
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoHooks_755156(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get list of hooks.
   ## 
   var section: JsonNode
@@ -11027,9 +10977,9 @@ proc call*(call_755161: Call_GetReposOwnerRepoHooks_755155; path: JsonNode = nil
   let scheme = call_755161.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755161.url(scheme.get, call_755161.host, call_755161.base,
-                         call_755161.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755161.makeUrl(scheme.get, call_755161.host, call_755161.base,
+                             call_755161.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755161, uri, valid, _)
 
 proc call*(call_755162: Call_GetReposOwnerRepoHooks_755155; repo: string;
@@ -11053,7 +11003,7 @@ var getReposOwnerRepoHooks* = Call_GetReposOwnerRepoHooks_755155(
     name: "getReposOwnerRepoHooks", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/hooks",
     validator: validate_GetReposOwnerRepoHooks_755156, base: "/",
-    url: url_GetReposOwnerRepoHooks_755157, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoHooks_755157, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoHooksHookId_755177 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoHooksHookId_755179(protocol: Scheme; host: string;
@@ -11083,8 +11033,7 @@ proc url_GetReposOwnerRepoHooksHookId_755179(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoHooksHookId_755178(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get single hook.
   ## 
   var section: JsonNode
@@ -11139,9 +11088,9 @@ proc call*(call_755184: Call_GetReposOwnerRepoHooksHookId_755177;
   let scheme = call_755184.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755184.url(scheme.get, call_755184.host, call_755184.base,
-                         call_755184.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755184.makeUrl(scheme.get, call_755184.host, call_755184.base,
+                             call_755184.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755184, uri, valid, _)
 
 proc call*(call_755185: Call_GetReposOwnerRepoHooksHookId_755177; hookId: int;
@@ -11168,7 +11117,7 @@ var getReposOwnerRepoHooksHookId* = Call_GetReposOwnerRepoHooksHookId_755177(
     name: "getReposOwnerRepoHooksHookId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/hooks/{hookId}",
     validator: validate_GetReposOwnerRepoHooksHookId_755178, base: "/",
-    url: url_GetReposOwnerRepoHooksHookId_755179, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoHooksHookId_755179, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoHooksHookId_755199 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoHooksHookId_755201(protocol: Scheme; host: string;
@@ -11199,7 +11148,7 @@ proc url_PatchReposOwnerRepoHooksHookId_755201(protocol: Scheme; host: string;
 
 proc validate_PatchReposOwnerRepoHooksHookId_755200(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Edit a hook.
   ## 
   var section: JsonNode
@@ -11258,9 +11207,9 @@ proc call*(call_755207: Call_PatchReposOwnerRepoHooksHookId_755199;
   let scheme = call_755207.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755207.url(scheme.get, call_755207.host, call_755207.base,
-                         call_755207.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755207.makeUrl(scheme.get, call_755207.host, call_755207.base,
+                             call_755207.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755207, uri, valid, _)
 
 proc call*(call_755208: Call_PatchReposOwnerRepoHooksHookId_755199; hookId: int;
@@ -11291,7 +11240,7 @@ var patchReposOwnerRepoHooksHookId* = Call_PatchReposOwnerRepoHooksHookId_755199
     name: "patchReposOwnerRepoHooksHookId", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/hooks/{hookId}",
     validator: validate_PatchReposOwnerRepoHooksHookId_755200, base: "/",
-    url: url_PatchReposOwnerRepoHooksHookId_755201, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoHooksHookId_755201, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoHooksHookId_755188 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoHooksHookId_755190(protocol: Scheme; host: string;
@@ -11322,7 +11271,7 @@ proc url_DeleteReposOwnerRepoHooksHookId_755190(protocol: Scheme; host: string;
 
 proc validate_DeleteReposOwnerRepoHooksHookId_755189(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a hook.
   ## 
   var section: JsonNode
@@ -11377,9 +11326,9 @@ proc call*(call_755195: Call_DeleteReposOwnerRepoHooksHookId_755188;
   let scheme = call_755195.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755195.url(scheme.get, call_755195.host, call_755195.base,
-                         call_755195.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755195.makeUrl(scheme.get, call_755195.host, call_755195.base,
+                             call_755195.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755195, uri, valid, _)
 
 proc call*(call_755196: Call_DeleteReposOwnerRepoHooksHookId_755188; hookId: int;
@@ -11406,7 +11355,7 @@ var deleteReposOwnerRepoHooksHookId* = Call_DeleteReposOwnerRepoHooksHookId_7551
     name: "deleteReposOwnerRepoHooksHookId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/hooks/{hookId}",
     validator: validate_DeleteReposOwnerRepoHooksHookId_755189, base: "/",
-    url: url_DeleteReposOwnerRepoHooksHookId_755190, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoHooksHookId_755190, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoHooksHookIdTests_755212 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoHooksHookIdTests_755214(protocol: Scheme; host: string;
@@ -11438,7 +11387,7 @@ proc url_PostReposOwnerRepoHooksHookIdTests_755214(protocol: Scheme; host: strin
 
 proc validate_PostReposOwnerRepoHooksHookIdTests_755213(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Test a push hook.
   ## This will trigger the hook with the latest push to the current repository
   ## if the hook is subscribed to push events. If the hook is not subscribed
@@ -11505,9 +11454,9 @@ proc call*(call_755219: Call_PostReposOwnerRepoHooksHookIdTests_755212;
   let scheme = call_755219.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755219.url(scheme.get, call_755219.host, call_755219.base,
-                         call_755219.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755219.makeUrl(scheme.get, call_755219.host, call_755219.base,
+                             call_755219.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755219, uri, valid, _)
 
 proc call*(call_755220: Call_PostReposOwnerRepoHooksHookIdTests_755212;
@@ -11540,7 +11489,8 @@ var postReposOwnerRepoHooksHookIdTests* = Call_PostReposOwnerRepoHooksHookIdTest
     name: "postReposOwnerRepoHooksHookIdTests", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/hooks/{hookId}/tests",
     validator: validate_PostReposOwnerRepoHooksHookIdTests_755213, base: "/",
-    url: url_PostReposOwnerRepoHooksHookIdTests_755214, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoHooksHookIdTests_755214,
+    schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoIssues_755240 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoIssues_755242(protocol: Scheme; host: string;
@@ -11569,8 +11519,7 @@ proc url_PostReposOwnerRepoIssues_755242(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoIssues_755241(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create an issue.
   ## Any user with pull access to a repository can create an issue.
   ## 
@@ -11627,9 +11576,9 @@ proc call*(call_755247: Call_PostReposOwnerRepoIssues_755240; path: JsonNode = n
   let scheme = call_755247.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755247.url(scheme.get, call_755247.host, call_755247.base,
-                         call_755247.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755247.makeUrl(scheme.get, call_755247.host, call_755247.base,
+                             call_755247.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755247, uri, valid, _)
 
 proc call*(call_755248: Call_PostReposOwnerRepoIssues_755240; repo: string;
@@ -11659,7 +11608,7 @@ var postReposOwnerRepoIssues* = Call_PostReposOwnerRepoIssues_755240(
     name: "postReposOwnerRepoIssues", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues",
     validator: validate_PostReposOwnerRepoIssues_755241, base: "/",
-    url: url_PostReposOwnerRepoIssues_755242, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoIssues_755242, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssues_755223 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoIssues_755225(protocol: Scheme; host: string; base: string;
@@ -11688,8 +11637,7 @@ proc url_GetReposOwnerRepoIssues_755225(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoIssues_755224(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List issues for a repository.
   ## 
   var section: JsonNode
@@ -11782,9 +11730,9 @@ proc call*(call_755235: Call_GetReposOwnerRepoIssues_755223; path: JsonNode = ni
   let scheme = call_755235.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755235.url(scheme.get, call_755235.host, call_755235.base,
-                         call_755235.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755235.makeUrl(scheme.get, call_755235.host, call_755235.base,
+                             call_755235.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755235, uri, valid, _)
 
 proc call*(call_755236: Call_GetReposOwnerRepoIssues_755223; labels: string;
@@ -11830,7 +11778,7 @@ var getReposOwnerRepoIssues* = Call_GetReposOwnerRepoIssues_755223(
     name: "getReposOwnerRepoIssues", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues",
     validator: validate_GetReposOwnerRepoIssues_755224, base: "/",
-    url: url_GetReposOwnerRepoIssues_755225, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssues_755225, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesComments_755252 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoIssuesComments_755254(protocol: Scheme; host: string;
@@ -11859,7 +11807,7 @@ proc url_GetReposOwnerRepoIssuesComments_755254(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoIssuesComments_755253(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List comments in a repository.
   ## 
   var section: JsonNode
@@ -11931,9 +11879,9 @@ proc call*(call_755261: Call_GetReposOwnerRepoIssuesComments_755252;
   let scheme = call_755261.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755261.url(scheme.get, call_755261.host, call_755261.base,
-                         call_755261.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755261.makeUrl(scheme.get, call_755261.host, call_755261.base,
+                             call_755261.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755261, uri, valid, _)
 
 proc call*(call_755262: Call_GetReposOwnerRepoIssuesComments_755252; repo: string;
@@ -11969,7 +11917,7 @@ var getReposOwnerRepoIssuesComments* = Call_GetReposOwnerRepoIssuesComments_7552
     name: "getReposOwnerRepoIssuesComments", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/comments",
     validator: validate_GetReposOwnerRepoIssuesComments_755253, base: "/",
-    url: url_GetReposOwnerRepoIssuesComments_755254, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssuesComments_755254, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesCommentsCommentId_755266 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoIssuesCommentsCommentId_755268(protocol: Scheme;
@@ -12000,7 +11948,7 @@ proc url_GetReposOwnerRepoIssuesCommentsCommentId_755268(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoIssuesCommentsCommentId_755267(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a single comment.
   ## 
   var section: JsonNode
@@ -12055,9 +12003,9 @@ proc call*(call_755273: Call_GetReposOwnerRepoIssuesCommentsCommentId_755266;
   let scheme = call_755273.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755273.url(scheme.get, call_755273.host, call_755273.base,
-                         call_755273.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755273.makeUrl(scheme.get, call_755273.host, call_755273.base,
+                             call_755273.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755273, uri, valid, _)
 
 proc call*(call_755274: Call_GetReposOwnerRepoIssuesCommentsCommentId_755266;
@@ -12085,7 +12033,7 @@ var getReposOwnerRepoIssuesCommentsCommentId* = Call_GetReposOwnerRepoIssuesComm
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/issues/comments/{commentId}",
     validator: validate_GetReposOwnerRepoIssuesCommentsCommentId_755267,
-    base: "/", url: url_GetReposOwnerRepoIssuesCommentsCommentId_755268,
+    base: "/", makeUrl: url_GetReposOwnerRepoIssuesCommentsCommentId_755268,
     schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoIssuesCommentsCommentId_755288 = ref object of OpenApiRestCall_753573
@@ -12117,7 +12065,7 @@ proc url_PatchReposOwnerRepoIssuesCommentsCommentId_755290(protocol: Scheme;
 
 proc validate_PatchReposOwnerRepoIssuesCommentsCommentId_755289(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Edit a comment.
   ## 
   var section: JsonNode
@@ -12176,9 +12124,9 @@ proc call*(call_755296: Call_PatchReposOwnerRepoIssuesCommentsCommentId_755288;
   let scheme = call_755296.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755296.url(scheme.get, call_755296.host, call_755296.base,
-                         call_755296.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755296.makeUrl(scheme.get, call_755296.host, call_755296.base,
+                             call_755296.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755296, uri, valid, _)
 
 proc call*(call_755297: Call_PatchReposOwnerRepoIssuesCommentsCommentId_755288;
@@ -12211,7 +12159,7 @@ var patchReposOwnerRepoIssuesCommentsCommentId* = Call_PatchReposOwnerRepoIssues
     meth: HttpMethod.HttpPatch, host: "api.github.com",
     route: "/repos/{owner}/{repo}/issues/comments/{commentId}",
     validator: validate_PatchReposOwnerRepoIssuesCommentsCommentId_755289,
-    base: "/", url: url_PatchReposOwnerRepoIssuesCommentsCommentId_755290,
+    base: "/", makeUrl: url_PatchReposOwnerRepoIssuesCommentsCommentId_755290,
     schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoIssuesCommentsCommentId_755277 = ref object of OpenApiRestCall_753573
@@ -12243,7 +12191,7 @@ proc url_DeleteReposOwnerRepoIssuesCommentsCommentId_755279(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoIssuesCommentsCommentId_755278(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a comment.
   ## 
   var section: JsonNode
@@ -12298,9 +12246,9 @@ proc call*(call_755284: Call_DeleteReposOwnerRepoIssuesCommentsCommentId_755277;
   let scheme = call_755284.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755284.url(scheme.get, call_755284.host, call_755284.base,
-                         call_755284.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755284.makeUrl(scheme.get, call_755284.host, call_755284.base,
+                             call_755284.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755284, uri, valid, _)
 
 proc call*(call_755285: Call_DeleteReposOwnerRepoIssuesCommentsCommentId_755277;
@@ -12328,7 +12276,7 @@ var deleteReposOwnerRepoIssuesCommentsCommentId* = Call_DeleteReposOwnerRepoIssu
     meth: HttpMethod.HttpDelete, host: "api.github.com",
     route: "/repos/{owner}/{repo}/issues/comments/{commentId}",
     validator: validate_DeleteReposOwnerRepoIssuesCommentsCommentId_755278,
-    base: "/", url: url_DeleteReposOwnerRepoIssuesCommentsCommentId_755279,
+    base: "/", makeUrl: url_DeleteReposOwnerRepoIssuesCommentsCommentId_755279,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesEvents_755301 = ref object of OpenApiRestCall_753573
@@ -12357,8 +12305,7 @@ proc url_GetReposOwnerRepoIssuesEvents_755303(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoIssuesEvents_755302(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List issue events for a repository.
   ## 
   var section: JsonNode
@@ -12407,9 +12354,9 @@ proc call*(call_755307: Call_GetReposOwnerRepoIssuesEvents_755301;
   let scheme = call_755307.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755307.url(scheme.get, call_755307.host, call_755307.base,
-                         call_755307.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755307.makeUrl(scheme.get, call_755307.host, call_755307.base,
+                             call_755307.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755307, uri, valid, _)
 
 proc call*(call_755308: Call_GetReposOwnerRepoIssuesEvents_755301; repo: string;
@@ -12433,7 +12380,7 @@ var getReposOwnerRepoIssuesEvents* = Call_GetReposOwnerRepoIssuesEvents_755301(
     name: "getReposOwnerRepoIssuesEvents", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/events",
     validator: validate_GetReposOwnerRepoIssuesEvents_755302, base: "/",
-    url: url_GetReposOwnerRepoIssuesEvents_755303, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssuesEvents_755303, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesEventsEventId_755311 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoIssuesEventsEventId_755313(protocol: Scheme;
@@ -12464,7 +12411,7 @@ proc url_GetReposOwnerRepoIssuesEventsEventId_755313(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoIssuesEventsEventId_755312(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a single event.
   ## 
   var section: JsonNode
@@ -12519,9 +12466,9 @@ proc call*(call_755318: Call_GetReposOwnerRepoIssuesEventsEventId_755311;
   let scheme = call_755318.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755318.url(scheme.get, call_755318.host, call_755318.base,
-                         call_755318.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755318.makeUrl(scheme.get, call_755318.host, call_755318.base,
+                             call_755318.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755318, uri, valid, _)
 
 proc call*(call_755319: Call_GetReposOwnerRepoIssuesEventsEventId_755311;
@@ -12549,7 +12496,8 @@ var getReposOwnerRepoIssuesEventsEventId* = Call_GetReposOwnerRepoIssuesEventsEv
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/issues/events/{eventId}",
     validator: validate_GetReposOwnerRepoIssuesEventsEventId_755312, base: "/",
-    url: url_GetReposOwnerRepoIssuesEventsEventId_755313, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssuesEventsEventId_755313,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesNumber_755322 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoIssuesNumber_755324(protocol: Scheme; host: string;
@@ -12579,8 +12527,7 @@ proc url_GetReposOwnerRepoIssuesNumber_755324(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoIssuesNumber_755323(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a single issue
   ## 
   var section: JsonNode
@@ -12635,9 +12582,9 @@ proc call*(call_755329: Call_GetReposOwnerRepoIssuesNumber_755322;
   let scheme = call_755329.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755329.url(scheme.get, call_755329.host, call_755329.base,
-                         call_755329.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755329.makeUrl(scheme.get, call_755329.host, call_755329.base,
+                             call_755329.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755329, uri, valid, _)
 
 proc call*(call_755330: Call_GetReposOwnerRepoIssuesNumber_755322; number: int;
@@ -12664,7 +12611,7 @@ var getReposOwnerRepoIssuesNumber* = Call_GetReposOwnerRepoIssuesNumber_755322(
     name: "getReposOwnerRepoIssuesNumber", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/{number}",
     validator: validate_GetReposOwnerRepoIssuesNumber_755323, base: "/",
-    url: url_GetReposOwnerRepoIssuesNumber_755324, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssuesNumber_755324, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoIssuesNumber_755333 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoIssuesNumber_755335(protocol: Scheme; host: string;
@@ -12695,7 +12642,7 @@ proc url_PatchReposOwnerRepoIssuesNumber_755335(protocol: Scheme; host: string;
 
 proc validate_PatchReposOwnerRepoIssuesNumber_755334(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Edit an issue.
   ## Issue owners and users with push access can edit an issue.
   ## 
@@ -12758,9 +12705,9 @@ proc call*(call_755341: Call_PatchReposOwnerRepoIssuesNumber_755333;
   let scheme = call_755341.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755341.url(scheme.get, call_755341.host, call_755341.base,
-                         call_755341.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755341.makeUrl(scheme.get, call_755341.host, call_755341.base,
+                             call_755341.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755341, uri, valid, _)
 
 proc call*(call_755342: Call_PatchReposOwnerRepoIssuesNumber_755333; number: int;
@@ -12793,7 +12740,7 @@ var patchReposOwnerRepoIssuesNumber* = Call_PatchReposOwnerRepoIssuesNumber_7553
     name: "patchReposOwnerRepoIssuesNumber", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/{number}",
     validator: validate_PatchReposOwnerRepoIssuesNumber_755334, base: "/",
-    url: url_PatchReposOwnerRepoIssuesNumber_755335, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoIssuesNumber_755335, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoIssuesNumberComments_755357 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoIssuesNumberComments_755359(protocol: Scheme;
@@ -12825,7 +12772,7 @@ proc url_PostReposOwnerRepoIssuesNumberComments_755359(protocol: Scheme;
 
 proc validate_PostReposOwnerRepoIssuesNumberComments_755358(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Create a comment.
   ## 
   var section: JsonNode
@@ -12884,9 +12831,9 @@ proc call*(call_755365: Call_PostReposOwnerRepoIssuesNumberComments_755357;
   let scheme = call_755365.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755365.url(scheme.get, call_755365.host, call_755365.base,
-                         call_755365.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755365.makeUrl(scheme.get, call_755365.host, call_755365.base,
+                             call_755365.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755365, uri, valid, _)
 
 proc call*(call_755366: Call_PostReposOwnerRepoIssuesNumberComments_755357;
@@ -12918,7 +12865,7 @@ var postReposOwnerRepoIssuesNumberComments* = Call_PostReposOwnerRepoIssuesNumbe
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/issues/{number}/comments",
     validator: validate_PostReposOwnerRepoIssuesNumberComments_755358, base: "/",
-    url: url_PostReposOwnerRepoIssuesNumberComments_755359,
+    makeUrl: url_PostReposOwnerRepoIssuesNumberComments_755359,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesNumberComments_755346 = ref object of OpenApiRestCall_753573
@@ -12951,7 +12898,7 @@ proc url_GetReposOwnerRepoIssuesNumberComments_755348(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoIssuesNumberComments_755347(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List comments on an issue.
   ## 
   var section: JsonNode
@@ -13006,9 +12953,9 @@ proc call*(call_755353: Call_GetReposOwnerRepoIssuesNumberComments_755346;
   let scheme = call_755353.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755353.url(scheme.get, call_755353.host, call_755353.base,
-                         call_755353.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755353.makeUrl(scheme.get, call_755353.host, call_755353.base,
+                             call_755353.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755353, uri, valid, _)
 
 proc call*(call_755354: Call_GetReposOwnerRepoIssuesNumberComments_755346;
@@ -13036,7 +12983,8 @@ var getReposOwnerRepoIssuesNumberComments* = Call_GetReposOwnerRepoIssuesNumberC
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/issues/{number}/comments",
     validator: validate_GetReposOwnerRepoIssuesNumberComments_755347, base: "/",
-    url: url_GetReposOwnerRepoIssuesNumberComments_755348, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssuesNumberComments_755348,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesNumberEvents_755370 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoIssuesNumberEvents_755372(protocol: Scheme; host: string;
@@ -13068,7 +13016,7 @@ proc url_GetReposOwnerRepoIssuesNumberEvents_755372(protocol: Scheme; host: stri
 
 proc validate_GetReposOwnerRepoIssuesNumberEvents_755371(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List events for an issue.
   ## 
   var section: JsonNode
@@ -13123,9 +13071,9 @@ proc call*(call_755377: Call_GetReposOwnerRepoIssuesNumberEvents_755370;
   let scheme = call_755377.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755377.url(scheme.get, call_755377.host, call_755377.base,
-                         call_755377.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755377.makeUrl(scheme.get, call_755377.host, call_755377.base,
+                             call_755377.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755377, uri, valid, _)
 
 proc call*(call_755378: Call_GetReposOwnerRepoIssuesNumberEvents_755370;
@@ -13152,7 +13100,8 @@ var getReposOwnerRepoIssuesNumberEvents* = Call_GetReposOwnerRepoIssuesNumberEve
     name: "getReposOwnerRepoIssuesNumberEvents", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/{number}/events",
     validator: validate_GetReposOwnerRepoIssuesNumberEvents_755371, base: "/",
-    url: url_GetReposOwnerRepoIssuesNumberEvents_755372, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssuesNumberEvents_755372,
+    schemes: {Scheme.Https})
 type
   Call_PutReposOwnerRepoIssuesNumberLabels_755392 = ref object of OpenApiRestCall_753573
 proc url_PutReposOwnerRepoIssuesNumberLabels_755394(protocol: Scheme; host: string;
@@ -13184,7 +13133,7 @@ proc url_PutReposOwnerRepoIssuesNumberLabels_755394(protocol: Scheme; host: stri
 
 proc validate_PutReposOwnerRepoIssuesNumberLabels_755393(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Replace all labels for an issue.
   ## Sending an empty array ([]) will remove all Labels from the Issue.
   ## 
@@ -13247,9 +13196,9 @@ proc call*(call_755400: Call_PutReposOwnerRepoIssuesNumberLabels_755392;
   let scheme = call_755400.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755400.url(scheme.get, call_755400.host, call_755400.base,
-                         call_755400.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755400.makeUrl(scheme.get, call_755400.host, call_755400.base,
+                             call_755400.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755400, uri, valid, _)
 
 proc call*(call_755401: Call_PutReposOwnerRepoIssuesNumberLabels_755392;
@@ -13282,7 +13231,8 @@ var putReposOwnerRepoIssuesNumberLabels* = Call_PutReposOwnerRepoIssuesNumberLab
     name: "putReposOwnerRepoIssuesNumberLabels", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/{number}/labels",
     validator: validate_PutReposOwnerRepoIssuesNumberLabels_755393, base: "/",
-    url: url_PutReposOwnerRepoIssuesNumberLabels_755394, schemes: {Scheme.Https})
+    makeUrl: url_PutReposOwnerRepoIssuesNumberLabels_755394,
+    schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoIssuesNumberLabels_755405 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoIssuesNumberLabels_755407(protocol: Scheme;
@@ -13314,7 +13264,7 @@ proc url_PostReposOwnerRepoIssuesNumberLabels_755407(protocol: Scheme;
 
 proc validate_PostReposOwnerRepoIssuesNumberLabels_755406(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Add labels to an issue.
   ## 
   var section: JsonNode
@@ -13373,9 +13323,9 @@ proc call*(call_755413: Call_PostReposOwnerRepoIssuesNumberLabels_755405;
   let scheme = call_755413.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755413.url(scheme.get, call_755413.host, call_755413.base,
-                         call_755413.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755413.makeUrl(scheme.get, call_755413.host, call_755413.base,
+                             call_755413.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755413, uri, valid, _)
 
 proc call*(call_755414: Call_PostReposOwnerRepoIssuesNumberLabels_755405;
@@ -13406,7 +13356,8 @@ var postReposOwnerRepoIssuesNumberLabels* = Call_PostReposOwnerRepoIssuesNumberL
     name: "postReposOwnerRepoIssuesNumberLabels", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/{number}/labels",
     validator: validate_PostReposOwnerRepoIssuesNumberLabels_755406, base: "/",
-    url: url_PostReposOwnerRepoIssuesNumberLabels_755407, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoIssuesNumberLabels_755407,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoIssuesNumberLabels_755381 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoIssuesNumberLabels_755383(protocol: Scheme; host: string;
@@ -13438,7 +13389,7 @@ proc url_GetReposOwnerRepoIssuesNumberLabels_755383(protocol: Scheme; host: stri
 
 proc validate_GetReposOwnerRepoIssuesNumberLabels_755382(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List labels on an issue.
   ## 
   var section: JsonNode
@@ -13493,9 +13444,9 @@ proc call*(call_755388: Call_GetReposOwnerRepoIssuesNumberLabels_755381;
   let scheme = call_755388.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755388.url(scheme.get, call_755388.host, call_755388.base,
-                         call_755388.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755388.makeUrl(scheme.get, call_755388.host, call_755388.base,
+                             call_755388.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755388, uri, valid, _)
 
 proc call*(call_755389: Call_GetReposOwnerRepoIssuesNumberLabels_755381;
@@ -13522,7 +13473,8 @@ var getReposOwnerRepoIssuesNumberLabels* = Call_GetReposOwnerRepoIssuesNumberLab
     name: "getReposOwnerRepoIssuesNumberLabels", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/{number}/labels",
     validator: validate_GetReposOwnerRepoIssuesNumberLabels_755382, base: "/",
-    url: url_GetReposOwnerRepoIssuesNumberLabels_755383, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoIssuesNumberLabels_755383,
+    schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoIssuesNumberLabels_755418 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoIssuesNumberLabels_755420(protocol: Scheme;
@@ -13554,7 +13506,7 @@ proc url_DeleteReposOwnerRepoIssuesNumberLabels_755420(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoIssuesNumberLabels_755419(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Remove all labels from an issue.
   ## 
   var section: JsonNode
@@ -13609,9 +13561,9 @@ proc call*(call_755425: Call_DeleteReposOwnerRepoIssuesNumberLabels_755418;
   let scheme = call_755425.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755425.url(scheme.get, call_755425.host, call_755425.base,
-                         call_755425.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755425.makeUrl(scheme.get, call_755425.host, call_755425.base,
+                             call_755425.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755425, uri, valid, _)
 
 proc call*(call_755426: Call_DeleteReposOwnerRepoIssuesNumberLabels_755418;
@@ -13638,7 +13590,7 @@ var deleteReposOwnerRepoIssuesNumberLabels* = Call_DeleteReposOwnerRepoIssuesNum
     name: "deleteReposOwnerRepoIssuesNumberLabels", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/issues/{number}/labels",
     validator: validate_DeleteReposOwnerRepoIssuesNumberLabels_755419, base: "/",
-    url: url_DeleteReposOwnerRepoIssuesNumberLabels_755420,
+    makeUrl: url_DeleteReposOwnerRepoIssuesNumberLabels_755420,
     schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoIssuesNumberLabelsName_755429 = ref object of OpenApiRestCall_753573
@@ -13673,7 +13625,7 @@ proc url_DeleteReposOwnerRepoIssuesNumberLabelsName_755431(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoIssuesNumberLabelsName_755430(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Remove a label from an issue.
   ## 
   var section: JsonNode
@@ -13735,9 +13687,9 @@ proc call*(call_755437: Call_DeleteReposOwnerRepoIssuesNumberLabelsName_755429;
   let scheme = call_755437.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755437.url(scheme.get, call_755437.host, call_755437.base,
-                         call_755437.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755437.makeUrl(scheme.get, call_755437.host, call_755437.base,
+                             call_755437.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755437, uri, valid, _)
 
 proc call*(call_755438: Call_DeleteReposOwnerRepoIssuesNumberLabelsName_755429;
@@ -13768,7 +13720,7 @@ var deleteReposOwnerRepoIssuesNumberLabelsName* = Call_DeleteReposOwnerRepoIssue
     meth: HttpMethod.HttpDelete, host: "api.github.com",
     route: "/repos/{owner}/{repo}/issues/{number}/labels/{name}",
     validator: validate_DeleteReposOwnerRepoIssuesNumberLabelsName_755430,
-    base: "/", url: url_DeleteReposOwnerRepoIssuesNumberLabelsName_755431,
+    base: "/", makeUrl: url_DeleteReposOwnerRepoIssuesNumberLabelsName_755431,
     schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoKeys_755451 = ref object of OpenApiRestCall_753573
@@ -13797,8 +13749,7 @@ proc url_PostReposOwnerRepoKeys_755453(protocol: Scheme; host: string; base: str
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoKeys_755452(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a key.
   ## 
   var section: JsonNode
@@ -13851,9 +13802,9 @@ proc call*(call_755458: Call_PostReposOwnerRepoKeys_755451; path: JsonNode = nil
   let scheme = call_755458.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755458.url(scheme.get, call_755458.host, call_755458.base,
-                         call_755458.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755458.makeUrl(scheme.get, call_755458.host, call_755458.base,
+                             call_755458.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755458, uri, valid, _)
 
 proc call*(call_755459: Call_PostReposOwnerRepoKeys_755451; repo: string;
@@ -13881,7 +13832,7 @@ var postReposOwnerRepoKeys* = Call_PostReposOwnerRepoKeys_755451(
     name: "postReposOwnerRepoKeys", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/keys",
     validator: validate_PostReposOwnerRepoKeys_755452, base: "/",
-    url: url_PostReposOwnerRepoKeys_755453, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoKeys_755453, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoKeys_755441 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoKeys_755443(protocol: Scheme; host: string; base: string;
@@ -13909,8 +13860,7 @@ proc url_GetReposOwnerRepoKeys_755443(protocol: Scheme; host: string; base: stri
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoKeys_755442(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get list of keys.
   ## 
   var section: JsonNode
@@ -13959,9 +13909,9 @@ proc call*(call_755447: Call_GetReposOwnerRepoKeys_755441; path: JsonNode = nil;
   let scheme = call_755447.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755447.url(scheme.get, call_755447.host, call_755447.base,
-                         call_755447.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755447.makeUrl(scheme.get, call_755447.host, call_755447.base,
+                             call_755447.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755447, uri, valid, _)
 
 proc call*(call_755448: Call_GetReposOwnerRepoKeys_755441; repo: string;
@@ -13985,7 +13935,7 @@ var getReposOwnerRepoKeys* = Call_GetReposOwnerRepoKeys_755441(
     name: "getReposOwnerRepoKeys", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/repos/{owner}/{repo}/keys",
     validator: validate_GetReposOwnerRepoKeys_755442, base: "/",
-    url: url_GetReposOwnerRepoKeys_755443, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoKeys_755443, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoKeysKeyId_755463 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoKeysKeyId_755465(protocol: Scheme; host: string;
@@ -14015,8 +13965,7 @@ proc url_GetReposOwnerRepoKeysKeyId_755465(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoKeysKeyId_755464(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a key
   ## 
   var section: JsonNode
@@ -14071,9 +14020,9 @@ proc call*(call_755470: Call_GetReposOwnerRepoKeysKeyId_755463;
   let scheme = call_755470.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755470.url(scheme.get, call_755470.host, call_755470.base,
-                         call_755470.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755470.makeUrl(scheme.get, call_755470.host, call_755470.base,
+                             call_755470.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755470, uri, valid, _)
 
 proc call*(call_755471: Call_GetReposOwnerRepoKeysKeyId_755463; keyId: int;
@@ -14100,7 +14049,7 @@ var getReposOwnerRepoKeysKeyId* = Call_GetReposOwnerRepoKeysKeyId_755463(
     name: "getReposOwnerRepoKeysKeyId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/keys/{keyId}",
     validator: validate_GetReposOwnerRepoKeysKeyId_755464, base: "/",
-    url: url_GetReposOwnerRepoKeysKeyId_755465, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoKeysKeyId_755465, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoKeysKeyId_755474 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoKeysKeyId_755476(protocol: Scheme; host: string;
@@ -14130,8 +14079,7 @@ proc url_DeleteReposOwnerRepoKeysKeyId_755476(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_DeleteReposOwnerRepoKeysKeyId_755475(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Delete a key.
   ## 
   var section: JsonNode
@@ -14186,9 +14134,9 @@ proc call*(call_755481: Call_DeleteReposOwnerRepoKeysKeyId_755474;
   let scheme = call_755481.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755481.url(scheme.get, call_755481.host, call_755481.base,
-                         call_755481.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755481.makeUrl(scheme.get, call_755481.host, call_755481.base,
+                             call_755481.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755481, uri, valid, _)
 
 proc call*(call_755482: Call_DeleteReposOwnerRepoKeysKeyId_755474; keyId: int;
@@ -14215,7 +14163,7 @@ var deleteReposOwnerRepoKeysKeyId* = Call_DeleteReposOwnerRepoKeysKeyId_755474(
     name: "deleteReposOwnerRepoKeysKeyId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/keys/{keyId}",
     validator: validate_DeleteReposOwnerRepoKeysKeyId_755475, base: "/",
-    url: url_DeleteReposOwnerRepoKeysKeyId_755476, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoKeysKeyId_755476, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoLabels_755495 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoLabels_755497(protocol: Scheme; host: string;
@@ -14244,8 +14192,7 @@ proc url_PostReposOwnerRepoLabels_755497(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoLabels_755496(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a label.
   ## 
   var section: JsonNode
@@ -14298,9 +14245,9 @@ proc call*(call_755502: Call_PostReposOwnerRepoLabels_755495; path: JsonNode = n
   let scheme = call_755502.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755502.url(scheme.get, call_755502.host, call_755502.base,
-                         call_755502.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755502.makeUrl(scheme.get, call_755502.host, call_755502.base,
+                             call_755502.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755502, uri, valid, _)
 
 proc call*(call_755503: Call_PostReposOwnerRepoLabels_755495; repo: string;
@@ -14328,7 +14275,7 @@ var postReposOwnerRepoLabels* = Call_PostReposOwnerRepoLabels_755495(
     name: "postReposOwnerRepoLabels", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/labels",
     validator: validate_PostReposOwnerRepoLabels_755496, base: "/",
-    url: url_PostReposOwnerRepoLabels_755497, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoLabels_755497, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoLabels_755485 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoLabels_755487(protocol: Scheme; host: string; base: string;
@@ -14357,8 +14304,7 @@ proc url_GetReposOwnerRepoLabels_755487(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoLabels_755486(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List all labels for this repository.
   ## 
   var section: JsonNode
@@ -14407,9 +14353,9 @@ proc call*(call_755491: Call_GetReposOwnerRepoLabels_755485; path: JsonNode = ni
   let scheme = call_755491.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755491.url(scheme.get, call_755491.host, call_755491.base,
-                         call_755491.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755491.makeUrl(scheme.get, call_755491.host, call_755491.base,
+                             call_755491.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755491, uri, valid, _)
 
 proc call*(call_755492: Call_GetReposOwnerRepoLabels_755485; repo: string;
@@ -14433,7 +14379,7 @@ var getReposOwnerRepoLabels* = Call_GetReposOwnerRepoLabels_755485(
     name: "getReposOwnerRepoLabels", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/labels",
     validator: validate_GetReposOwnerRepoLabels_755486, base: "/",
-    url: url_GetReposOwnerRepoLabels_755487, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoLabels_755487, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoLabelsName_755507 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoLabelsName_755509(protocol: Scheme; host: string;
@@ -14463,8 +14409,7 @@ proc url_GetReposOwnerRepoLabelsName_755509(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoLabelsName_755508(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a single label.
   ## 
   var section: JsonNode
@@ -14520,9 +14465,9 @@ proc call*(call_755514: Call_GetReposOwnerRepoLabelsName_755507;
   let scheme = call_755514.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755514.url(scheme.get, call_755514.host, call_755514.base,
-                         call_755514.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755514.makeUrl(scheme.get, call_755514.host, call_755514.base,
+                             call_755514.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755514, uri, valid, _)
 
 proc call*(call_755515: Call_GetReposOwnerRepoLabelsName_755507; name: string;
@@ -14549,7 +14494,7 @@ var getReposOwnerRepoLabelsName* = Call_GetReposOwnerRepoLabelsName_755507(
     name: "getReposOwnerRepoLabelsName", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/labels/{name}",
     validator: validate_GetReposOwnerRepoLabelsName_755508, base: "/",
-    url: url_GetReposOwnerRepoLabelsName_755509, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoLabelsName_755509, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoLabelsName_755529 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoLabelsName_755531(protocol: Scheme; host: string;
@@ -14579,8 +14524,7 @@ proc url_PatchReposOwnerRepoLabelsName_755531(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PatchReposOwnerRepoLabelsName_755530(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Update a label.
   ## 
   var section: JsonNode
@@ -14640,9 +14584,9 @@ proc call*(call_755537: Call_PatchReposOwnerRepoLabelsName_755529;
   let scheme = call_755537.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755537.url(scheme.get, call_755537.host, call_755537.base,
-                         call_755537.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755537.makeUrl(scheme.get, call_755537.host, call_755537.base,
+                             call_755537.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755537, uri, valid, _)
 
 proc call*(call_755538: Call_PatchReposOwnerRepoLabelsName_755529; name: string;
@@ -14673,7 +14617,7 @@ var patchReposOwnerRepoLabelsName* = Call_PatchReposOwnerRepoLabelsName_755529(
     name: "patchReposOwnerRepoLabelsName", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/labels/{name}",
     validator: validate_PatchReposOwnerRepoLabelsName_755530, base: "/",
-    url: url_PatchReposOwnerRepoLabelsName_755531, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoLabelsName_755531, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoLabelsName_755518 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoLabelsName_755520(protocol: Scheme; host: string;
@@ -14704,7 +14648,7 @@ proc url_DeleteReposOwnerRepoLabelsName_755520(protocol: Scheme; host: string;
 
 proc validate_DeleteReposOwnerRepoLabelsName_755519(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a label.
   ## 
   var section: JsonNode
@@ -14760,9 +14704,9 @@ proc call*(call_755525: Call_DeleteReposOwnerRepoLabelsName_755518;
   let scheme = call_755525.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755525.url(scheme.get, call_755525.host, call_755525.base,
-                         call_755525.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755525.makeUrl(scheme.get, call_755525.host, call_755525.base,
+                             call_755525.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755525, uri, valid, _)
 
 proc call*(call_755526: Call_DeleteReposOwnerRepoLabelsName_755518; name: string;
@@ -14789,7 +14733,7 @@ var deleteReposOwnerRepoLabelsName* = Call_DeleteReposOwnerRepoLabelsName_755518
     name: "deleteReposOwnerRepoLabelsName", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/labels/{name}",
     validator: validate_DeleteReposOwnerRepoLabelsName_755519, base: "/",
-    url: url_DeleteReposOwnerRepoLabelsName_755520, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoLabelsName_755520, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoLanguages_755542 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoLanguages_755544(protocol: Scheme; host: string;
@@ -14817,8 +14761,7 @@ proc url_GetReposOwnerRepoLanguages_755544(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoLanguages_755543(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List languages.
   ## List languages for the specified repository. The value on the right of a
   ## language is the number of bytes of code written in that language.
@@ -14873,9 +14816,9 @@ proc call*(call_755548: Call_GetReposOwnerRepoLanguages_755542;
   let scheme = call_755548.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755548.url(scheme.get, call_755548.host, call_755548.base,
-                         call_755548.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755548.makeUrl(scheme.get, call_755548.host, call_755548.base,
+                             call_755548.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755548, uri, valid, _)
 
 proc call*(call_755549: Call_GetReposOwnerRepoLanguages_755542; repo: string;
@@ -14902,7 +14845,7 @@ var getReposOwnerRepoLanguages* = Call_GetReposOwnerRepoLanguages_755542(
     name: "getReposOwnerRepoLanguages", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/languages",
     validator: validate_GetReposOwnerRepoLanguages_755543, base: "/",
-    url: url_GetReposOwnerRepoLanguages_755544, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoLanguages_755544, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoMerges_755552 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoMerges_755554(protocol: Scheme; host: string;
@@ -14931,8 +14874,7 @@ proc url_PostReposOwnerRepoMerges_755554(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoMerges_755553(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Perform a merge.
   ## 
   var section: JsonNode
@@ -14985,9 +14927,9 @@ proc call*(call_755559: Call_PostReposOwnerRepoMerges_755552; path: JsonNode = n
   let scheme = call_755559.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755559.url(scheme.get, call_755559.host, call_755559.base,
-                         call_755559.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755559.makeUrl(scheme.get, call_755559.host, call_755559.base,
+                             call_755559.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755559, uri, valid, _)
 
 proc call*(call_755560: Call_PostReposOwnerRepoMerges_755552; repo: string;
@@ -15015,7 +14957,7 @@ var postReposOwnerRepoMerges* = Call_PostReposOwnerRepoMerges_755552(
     name: "postReposOwnerRepoMerges", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/merges",
     validator: validate_PostReposOwnerRepoMerges_755553, base: "/",
-    url: url_PostReposOwnerRepoMerges_755554, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoMerges_755554, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoMilestones_755578 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoMilestones_755580(protocol: Scheme; host: string;
@@ -15043,8 +14985,7 @@ proc url_PostReposOwnerRepoMilestones_755580(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoMilestones_755579(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a milestone.
   ## 
   var section: JsonNode
@@ -15097,9 +15038,9 @@ proc call*(call_755585: Call_PostReposOwnerRepoMilestones_755578;
   let scheme = call_755585.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755585.url(scheme.get, call_755585.host, call_755585.base,
-                         call_755585.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755585.makeUrl(scheme.get, call_755585.host, call_755585.base,
+                             call_755585.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755585, uri, valid, _)
 
 proc call*(call_755586: Call_PostReposOwnerRepoMilestones_755578; repo: string;
@@ -15127,7 +15068,7 @@ var postReposOwnerRepoMilestones* = Call_PostReposOwnerRepoMilestones_755578(
     name: "postReposOwnerRepoMilestones", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/milestones",
     validator: validate_PostReposOwnerRepoMilestones_755579, base: "/",
-    url: url_PostReposOwnerRepoMilestones_755580, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoMilestones_755580, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoMilestones_755564 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoMilestones_755566(protocol: Scheme; host: string;
@@ -15155,8 +15096,7 @@ proc url_GetReposOwnerRepoMilestones_755566(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoMilestones_755565(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List milestones for a repository.
   ## 
   var section: JsonNode
@@ -15226,9 +15166,9 @@ proc call*(call_755573: Call_GetReposOwnerRepoMilestones_755564;
   let scheme = call_755573.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755573.url(scheme.get, call_755573.host, call_755573.base,
-                         call_755573.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755573.makeUrl(scheme.get, call_755573.host, call_755573.base,
+                             call_755573.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755573, uri, valid, _)
 
 proc call*(call_755574: Call_GetReposOwnerRepoMilestones_755564; repo: string;
@@ -15262,7 +15202,7 @@ var getReposOwnerRepoMilestones* = Call_GetReposOwnerRepoMilestones_755564(
     name: "getReposOwnerRepoMilestones", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/milestones",
     validator: validate_GetReposOwnerRepoMilestones_755565, base: "/",
-    url: url_GetReposOwnerRepoMilestones_755566, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoMilestones_755566, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoMilestonesNumber_755590 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoMilestonesNumber_755592(protocol: Scheme; host: string;
@@ -15293,7 +15233,7 @@ proc url_GetReposOwnerRepoMilestonesNumber_755592(protocol: Scheme; host: string
 
 proc validate_GetReposOwnerRepoMilestonesNumber_755591(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a single milestone.
   ## 
   var section: JsonNode
@@ -15348,9 +15288,9 @@ proc call*(call_755597: Call_GetReposOwnerRepoMilestonesNumber_755590;
   let scheme = call_755597.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755597.url(scheme.get, call_755597.host, call_755597.base,
-                         call_755597.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755597.makeUrl(scheme.get, call_755597.host, call_755597.base,
+                             call_755597.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755597, uri, valid, _)
 
 proc call*(call_755598: Call_GetReposOwnerRepoMilestonesNumber_755590; number: int;
@@ -15377,7 +15317,7 @@ var getReposOwnerRepoMilestonesNumber* = Call_GetReposOwnerRepoMilestonesNumber_
     name: "getReposOwnerRepoMilestonesNumber", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/milestones/{number}",
     validator: validate_GetReposOwnerRepoMilestonesNumber_755591, base: "/",
-    url: url_GetReposOwnerRepoMilestonesNumber_755592, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoMilestonesNumber_755592, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoMilestonesNumber_755612 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoMilestonesNumber_755614(protocol: Scheme; host: string;
@@ -15408,7 +15348,7 @@ proc url_PatchReposOwnerRepoMilestonesNumber_755614(protocol: Scheme; host: stri
 
 proc validate_PatchReposOwnerRepoMilestonesNumber_755613(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Update a milestone.
   ## 
   var section: JsonNode
@@ -15467,9 +15407,9 @@ proc call*(call_755620: Call_PatchReposOwnerRepoMilestonesNumber_755612;
   let scheme = call_755620.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755620.url(scheme.get, call_755620.host, call_755620.base,
-                         call_755620.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755620.makeUrl(scheme.get, call_755620.host, call_755620.base,
+                             call_755620.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755620, uri, valid, _)
 
 proc call*(call_755621: Call_PatchReposOwnerRepoMilestonesNumber_755612;
@@ -15500,7 +15440,8 @@ var patchReposOwnerRepoMilestonesNumber* = Call_PatchReposOwnerRepoMilestonesNum
     name: "patchReposOwnerRepoMilestonesNumber", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/milestones/{number}",
     validator: validate_PatchReposOwnerRepoMilestonesNumber_755613, base: "/",
-    url: url_PatchReposOwnerRepoMilestonesNumber_755614, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoMilestonesNumber_755614,
+    schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoMilestonesNumber_755601 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoMilestonesNumber_755603(protocol: Scheme;
@@ -15531,7 +15472,7 @@ proc url_DeleteReposOwnerRepoMilestonesNumber_755603(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoMilestonesNumber_755602(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a milestone.
   ## 
   var section: JsonNode
@@ -15586,9 +15527,9 @@ proc call*(call_755608: Call_DeleteReposOwnerRepoMilestonesNumber_755601;
   let scheme = call_755608.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755608.url(scheme.get, call_755608.host, call_755608.base,
-                         call_755608.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755608.makeUrl(scheme.get, call_755608.host, call_755608.base,
+                             call_755608.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755608, uri, valid, _)
 
 proc call*(call_755609: Call_DeleteReposOwnerRepoMilestonesNumber_755601;
@@ -15615,7 +15556,8 @@ var deleteReposOwnerRepoMilestonesNumber* = Call_DeleteReposOwnerRepoMilestonesN
     name: "deleteReposOwnerRepoMilestonesNumber", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/milestones/{number}",
     validator: validate_DeleteReposOwnerRepoMilestonesNumber_755602, base: "/",
-    url: url_DeleteReposOwnerRepoMilestonesNumber_755603, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoMilestonesNumber_755603,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoMilestonesNumberLabels_755625 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoMilestonesNumberLabels_755627(protocol: Scheme;
@@ -15647,7 +15589,7 @@ proc url_GetReposOwnerRepoMilestonesNumberLabels_755627(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoMilestonesNumberLabels_755626(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get labels for every issue in a milestone.
   ## 
   var section: JsonNode
@@ -15702,9 +15644,9 @@ proc call*(call_755632: Call_GetReposOwnerRepoMilestonesNumberLabels_755625;
   let scheme = call_755632.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755632.url(scheme.get, call_755632.host, call_755632.base,
-                         call_755632.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755632.makeUrl(scheme.get, call_755632.host, call_755632.base,
+                             call_755632.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755632, uri, valid, _)
 
 proc call*(call_755633: Call_GetReposOwnerRepoMilestonesNumberLabels_755625;
@@ -15732,7 +15674,7 @@ var getReposOwnerRepoMilestonesNumberLabels* = Call_GetReposOwnerRepoMilestonesN
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/milestones/{number}/labels",
     validator: validate_GetReposOwnerRepoMilestonesNumberLabels_755626, base: "/",
-    url: url_GetReposOwnerRepoMilestonesNumberLabels_755627,
+    makeUrl: url_GetReposOwnerRepoMilestonesNumberLabels_755627,
     schemes: {Scheme.Https})
 type
   Call_PutReposOwnerRepoNotifications_755650 = ref object of OpenApiRestCall_753573
@@ -15762,7 +15704,7 @@ proc url_PutReposOwnerRepoNotifications_755652(protocol: Scheme; host: string;
 
 proc validate_PutReposOwnerRepoNotifications_755651(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Mark notifications as read in a repository.
   ## Marking all notifications in a repository as "read" removes them from the
   ## default view on GitHub.com.
@@ -15821,9 +15763,9 @@ proc call*(call_755657: Call_PutReposOwnerRepoNotifications_755650;
   let scheme = call_755657.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755657.url(scheme.get, call_755657.host, call_755657.base,
-                         call_755657.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755657.makeUrl(scheme.get, call_755657.host, call_755657.base,
+                             call_755657.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755657, uri, valid, _)
 
 proc call*(call_755658: Call_PutReposOwnerRepoNotifications_755650; repo: string;
@@ -15854,7 +15796,7 @@ var putReposOwnerRepoNotifications* = Call_PutReposOwnerRepoNotifications_755650
     name: "putReposOwnerRepoNotifications", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/repos/{owner}/{repo}/notifications",
     validator: validate_PutReposOwnerRepoNotifications_755651, base: "/",
-    url: url_PutReposOwnerRepoNotifications_755652, schemes: {Scheme.Https})
+    makeUrl: url_PutReposOwnerRepoNotifications_755652, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoNotifications_755636 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoNotifications_755638(protocol: Scheme; host: string;
@@ -15883,7 +15825,7 @@ proc url_GetReposOwnerRepoNotifications_755638(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoNotifications_755637(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List your notifications in a repository
   ## List all notifications for the current user.
   ## 
@@ -15960,9 +15902,9 @@ proc call*(call_755645: Call_GetReposOwnerRepoNotifications_755636;
   let scheme = call_755645.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755645.url(scheme.get, call_755645.host, call_755645.base,
-                         call_755645.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755645.makeUrl(scheme.get, call_755645.host, call_755645.base,
+                             call_755645.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755645, uri, valid, _)
 
 proc call*(call_755646: Call_GetReposOwnerRepoNotifications_755636; repo: string;
@@ -16003,7 +15945,7 @@ var getReposOwnerRepoNotifications* = Call_GetReposOwnerRepoNotifications_755636
     name: "getReposOwnerRepoNotifications", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/notifications",
     validator: validate_GetReposOwnerRepoNotifications_755637, base: "/",
-    url: url_GetReposOwnerRepoNotifications_755638, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoNotifications_755638, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoPulls_755676 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoPulls_755678(protocol: Scheme; host: string; base: string;
@@ -16032,8 +15974,7 @@ proc url_PostReposOwnerRepoPulls_755678(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoPulls_755677(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a pull request.
   ## 
   var section: JsonNode
@@ -16086,9 +16027,9 @@ proc call*(call_755683: Call_PostReposOwnerRepoPulls_755676; path: JsonNode = ni
   let scheme = call_755683.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755683.url(scheme.get, call_755683.host, call_755683.base,
-                         call_755683.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755683.makeUrl(scheme.get, call_755683.host, call_755683.base,
+                             call_755683.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755683, uri, valid, _)
 
 proc call*(call_755684: Call_PostReposOwnerRepoPulls_755676; repo: string;
@@ -16116,7 +16057,7 @@ var postReposOwnerRepoPulls* = Call_PostReposOwnerRepoPulls_755676(
     name: "postReposOwnerRepoPulls", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls",
     validator: validate_PostReposOwnerRepoPulls_755677, base: "/",
-    url: url_PostReposOwnerRepoPulls_755678, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoPulls_755678, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPulls_755662 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoPulls_755664(protocol: Scheme; host: string; base: string;
@@ -16144,8 +16085,7 @@ proc url_GetReposOwnerRepoPulls_755664(protocol: Scheme; host: string; base: str
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoPulls_755663(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List pull requests.
   ## 
   var section: JsonNode
@@ -16218,9 +16158,9 @@ proc call*(call_755671: Call_GetReposOwnerRepoPulls_755662; path: JsonNode = nil
   let scheme = call_755671.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755671.url(scheme.get, call_755671.host, call_755671.base,
-                         call_755671.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755671.makeUrl(scheme.get, call_755671.host, call_755671.base,
+                             call_755671.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755671, uri, valid, _)
 
 proc call*(call_755672: Call_GetReposOwnerRepoPulls_755662; repo: string;
@@ -16257,7 +16197,7 @@ var getReposOwnerRepoPulls* = Call_GetReposOwnerRepoPulls_755662(
     name: "getReposOwnerRepoPulls", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls",
     validator: validate_GetReposOwnerRepoPulls_755663, base: "/",
-    url: url_GetReposOwnerRepoPulls_755664, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoPulls_755664, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPullsComments_755688 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoPullsComments_755690(protocol: Scheme; host: string;
@@ -16286,7 +16226,7 @@ proc url_GetReposOwnerRepoPullsComments_755690(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoPullsComments_755689(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List comments in a repository.
   ## By default, Review Comments are ordered by ascending ID.
   ## 
@@ -16362,9 +16302,9 @@ proc call*(call_755697: Call_GetReposOwnerRepoPullsComments_755688;
   let scheme = call_755697.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755697.url(scheme.get, call_755697.host, call_755697.base,
-                         call_755697.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755697.makeUrl(scheme.get, call_755697.host, call_755697.base,
+                             call_755697.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755697, uri, valid, _)
 
 proc call*(call_755698: Call_GetReposOwnerRepoPullsComments_755688; repo: string;
@@ -16402,7 +16342,7 @@ var getReposOwnerRepoPullsComments* = Call_GetReposOwnerRepoPullsComments_755688
     name: "getReposOwnerRepoPullsComments", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls/comments",
     validator: validate_GetReposOwnerRepoPullsComments_755689, base: "/",
-    url: url_GetReposOwnerRepoPullsComments_755690, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoPullsComments_755690, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPullsCommentsCommentId_755702 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoPullsCommentsCommentId_755704(protocol: Scheme;
@@ -16433,7 +16373,7 @@ proc url_GetReposOwnerRepoPullsCommentsCommentId_755704(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoPullsCommentsCommentId_755703(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a single comment.
   ## 
   var section: JsonNode
@@ -16488,9 +16428,9 @@ proc call*(call_755709: Call_GetReposOwnerRepoPullsCommentsCommentId_755702;
   let scheme = call_755709.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755709.url(scheme.get, call_755709.host, call_755709.base,
-                         call_755709.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755709.makeUrl(scheme.get, call_755709.host, call_755709.base,
+                             call_755709.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755709, uri, valid, _)
 
 proc call*(call_755710: Call_GetReposOwnerRepoPullsCommentsCommentId_755702;
@@ -16518,7 +16458,7 @@ var getReposOwnerRepoPullsCommentsCommentId* = Call_GetReposOwnerRepoPullsCommen
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/pulls/comments/{commentId}",
     validator: validate_GetReposOwnerRepoPullsCommentsCommentId_755703, base: "/",
-    url: url_GetReposOwnerRepoPullsCommentsCommentId_755704,
+    makeUrl: url_GetReposOwnerRepoPullsCommentsCommentId_755704,
     schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoPullsCommentsCommentId_755724 = ref object of OpenApiRestCall_753573
@@ -16550,7 +16490,7 @@ proc url_PatchReposOwnerRepoPullsCommentsCommentId_755726(protocol: Scheme;
 
 proc validate_PatchReposOwnerRepoPullsCommentsCommentId_755725(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Edit a comment.
   ## 
   var section: JsonNode
@@ -16609,9 +16549,9 @@ proc call*(call_755732: Call_PatchReposOwnerRepoPullsCommentsCommentId_755724;
   let scheme = call_755732.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755732.url(scheme.get, call_755732.host, call_755732.base,
-                         call_755732.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755732.makeUrl(scheme.get, call_755732.host, call_755732.base,
+                             call_755732.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755732, uri, valid, _)
 
 proc call*(call_755733: Call_PatchReposOwnerRepoPullsCommentsCommentId_755724;
@@ -16644,7 +16584,7 @@ var patchReposOwnerRepoPullsCommentsCommentId* = Call_PatchReposOwnerRepoPullsCo
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/pulls/comments/{commentId}",
     validator: validate_PatchReposOwnerRepoPullsCommentsCommentId_755725,
-    base: "/", url: url_PatchReposOwnerRepoPullsCommentsCommentId_755726,
+    base: "/", makeUrl: url_PatchReposOwnerRepoPullsCommentsCommentId_755726,
     schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoPullsCommentsCommentId_755713 = ref object of OpenApiRestCall_753573
@@ -16676,7 +16616,7 @@ proc url_DeleteReposOwnerRepoPullsCommentsCommentId_755715(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoPullsCommentsCommentId_755714(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a comment.
   ## 
   var section: JsonNode
@@ -16731,9 +16671,9 @@ proc call*(call_755720: Call_DeleteReposOwnerRepoPullsCommentsCommentId_755713;
   let scheme = call_755720.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755720.url(scheme.get, call_755720.host, call_755720.base,
-                         call_755720.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755720.makeUrl(scheme.get, call_755720.host, call_755720.base,
+                             call_755720.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755720, uri, valid, _)
 
 proc call*(call_755721: Call_DeleteReposOwnerRepoPullsCommentsCommentId_755713;
@@ -16761,7 +16701,7 @@ var deleteReposOwnerRepoPullsCommentsCommentId* = Call_DeleteReposOwnerRepoPulls
     meth: HttpMethod.HttpDelete, host: "api.github.com",
     route: "/repos/{owner}/{repo}/pulls/comments/{commentId}",
     validator: validate_DeleteReposOwnerRepoPullsCommentsCommentId_755714,
-    base: "/", url: url_DeleteReposOwnerRepoPullsCommentsCommentId_755715,
+    base: "/", makeUrl: url_DeleteReposOwnerRepoPullsCommentsCommentId_755715,
     schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPullsNumber_755737 = ref object of OpenApiRestCall_753573
@@ -16792,8 +16732,7 @@ proc url_GetReposOwnerRepoPullsNumber_755739(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoPullsNumber_755738(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a single pull request.
   ## 
   var section: JsonNode
@@ -16848,9 +16787,9 @@ proc call*(call_755744: Call_GetReposOwnerRepoPullsNumber_755737;
   let scheme = call_755744.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755744.url(scheme.get, call_755744.host, call_755744.base,
-                         call_755744.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755744.makeUrl(scheme.get, call_755744.host, call_755744.base,
+                             call_755744.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755744, uri, valid, _)
 
 proc call*(call_755745: Call_GetReposOwnerRepoPullsNumber_755737; number: int;
@@ -16877,7 +16816,7 @@ var getReposOwnerRepoPullsNumber* = Call_GetReposOwnerRepoPullsNumber_755737(
     name: "getReposOwnerRepoPullsNumber", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls/{number}",
     validator: validate_GetReposOwnerRepoPullsNumber_755738, base: "/",
-    url: url_GetReposOwnerRepoPullsNumber_755739, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoPullsNumber_755739, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoPullsNumber_755748 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoPullsNumber_755750(protocol: Scheme; host: string;
@@ -16908,7 +16847,7 @@ proc url_PatchReposOwnerRepoPullsNumber_755750(protocol: Scheme; host: string;
 
 proc validate_PatchReposOwnerRepoPullsNumber_755749(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Update a pull request.
   ## 
   var section: JsonNode
@@ -16967,9 +16906,9 @@ proc call*(call_755756: Call_PatchReposOwnerRepoPullsNumber_755748;
   let scheme = call_755756.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755756.url(scheme.get, call_755756.host, call_755756.base,
-                         call_755756.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755756.makeUrl(scheme.get, call_755756.host, call_755756.base,
+                             call_755756.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755756, uri, valid, _)
 
 proc call*(call_755757: Call_PatchReposOwnerRepoPullsNumber_755748; number: int;
@@ -17000,7 +16939,7 @@ var patchReposOwnerRepoPullsNumber* = Call_PatchReposOwnerRepoPullsNumber_755748
     name: "patchReposOwnerRepoPullsNumber", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls/{number}",
     validator: validate_PatchReposOwnerRepoPullsNumber_755749, base: "/",
-    url: url_PatchReposOwnerRepoPullsNumber_755750, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoPullsNumber_755750, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoPullsNumberComments_755772 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoPullsNumberComments_755774(protocol: Scheme;
@@ -17032,7 +16971,7 @@ proc url_PostReposOwnerRepoPullsNumberComments_755774(protocol: Scheme;
 
 proc validate_PostReposOwnerRepoPullsNumberComments_755773(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Create a comment.
   ##   #TODO Alternative input ( http://developer.github.com/v3/pulls/comments/ )
   ##   description: |
@@ -17113,9 +17052,9 @@ proc call*(call_755780: Call_PostReposOwnerRepoPullsNumberComments_755772;
   let scheme = call_755780.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755780.url(scheme.get, call_755780.host, call_755780.base,
-                         call_755780.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755780.makeUrl(scheme.get, call_755780.host, call_755780.base,
+                             call_755780.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755780, uri, valid, _)
 
 proc call*(call_755781: Call_PostReposOwnerRepoPullsNumberComments_755772;
@@ -17158,7 +17097,8 @@ var postReposOwnerRepoPullsNumberComments* = Call_PostReposOwnerRepoPullsNumberC
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/pulls/{number}/comments",
     validator: validate_PostReposOwnerRepoPullsNumberComments_755773, base: "/",
-    url: url_PostReposOwnerRepoPullsNumberComments_755774, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoPullsNumberComments_755774,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPullsNumberComments_755761 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoPullsNumberComments_755763(protocol: Scheme;
@@ -17190,7 +17130,7 @@ proc url_GetReposOwnerRepoPullsNumberComments_755763(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoPullsNumberComments_755762(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List comments on a pull request.
   ## 
   var section: JsonNode
@@ -17245,9 +17185,9 @@ proc call*(call_755768: Call_GetReposOwnerRepoPullsNumberComments_755761;
   let scheme = call_755768.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755768.url(scheme.get, call_755768.host, call_755768.base,
-                         call_755768.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755768.makeUrl(scheme.get, call_755768.host, call_755768.base,
+                             call_755768.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755768, uri, valid, _)
 
 proc call*(call_755769: Call_GetReposOwnerRepoPullsNumberComments_755761;
@@ -17275,7 +17215,8 @@ var getReposOwnerRepoPullsNumberComments* = Call_GetReposOwnerRepoPullsNumberCom
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/pulls/{number}/comments",
     validator: validate_GetReposOwnerRepoPullsNumberComments_755762, base: "/",
-    url: url_GetReposOwnerRepoPullsNumberComments_755763, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoPullsNumberComments_755763,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPullsNumberCommits_755785 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoPullsNumberCommits_755787(protocol: Scheme; host: string;
@@ -17307,7 +17248,7 @@ proc url_GetReposOwnerRepoPullsNumberCommits_755787(protocol: Scheme; host: stri
 
 proc validate_GetReposOwnerRepoPullsNumberCommits_755786(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List commits on a pull request.
   ## 
   var section: JsonNode
@@ -17362,9 +17303,9 @@ proc call*(call_755792: Call_GetReposOwnerRepoPullsNumberCommits_755785;
   let scheme = call_755792.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755792.url(scheme.get, call_755792.host, call_755792.base,
-                         call_755792.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755792.makeUrl(scheme.get, call_755792.host, call_755792.base,
+                             call_755792.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755792, uri, valid, _)
 
 proc call*(call_755793: Call_GetReposOwnerRepoPullsNumberCommits_755785;
@@ -17391,7 +17332,8 @@ var getReposOwnerRepoPullsNumberCommits* = Call_GetReposOwnerRepoPullsNumberComm
     name: "getReposOwnerRepoPullsNumberCommits", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls/{number}/commits",
     validator: validate_GetReposOwnerRepoPullsNumberCommits_755786, base: "/",
-    url: url_GetReposOwnerRepoPullsNumberCommits_755787, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoPullsNumberCommits_755787,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPullsNumberFiles_755796 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoPullsNumberFiles_755798(protocol: Scheme; host: string;
@@ -17423,7 +17365,7 @@ proc url_GetReposOwnerRepoPullsNumberFiles_755798(protocol: Scheme; host: string
 
 proc validate_GetReposOwnerRepoPullsNumberFiles_755797(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List pull requests files.
   ## 
   var section: JsonNode
@@ -17478,9 +17420,9 @@ proc call*(call_755803: Call_GetReposOwnerRepoPullsNumberFiles_755796;
   let scheme = call_755803.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755803.url(scheme.get, call_755803.host, call_755803.base,
-                         call_755803.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755803.makeUrl(scheme.get, call_755803.host, call_755803.base,
+                             call_755803.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755803, uri, valid, _)
 
 proc call*(call_755804: Call_GetReposOwnerRepoPullsNumberFiles_755796; number: int;
@@ -17507,7 +17449,7 @@ var getReposOwnerRepoPullsNumberFiles* = Call_GetReposOwnerRepoPullsNumberFiles_
     name: "getReposOwnerRepoPullsNumberFiles", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls/{number}/files",
     validator: validate_GetReposOwnerRepoPullsNumberFiles_755797, base: "/",
-    url: url_GetReposOwnerRepoPullsNumberFiles_755798, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoPullsNumberFiles_755798, schemes: {Scheme.Https})
 type
   Call_PutReposOwnerRepoPullsNumberMerge_755818 = ref object of OpenApiRestCall_753573
 proc url_PutReposOwnerRepoPullsNumberMerge_755820(protocol: Scheme; host: string;
@@ -17539,7 +17481,7 @@ proc url_PutReposOwnerRepoPullsNumberMerge_755820(protocol: Scheme; host: string
 
 proc validate_PutReposOwnerRepoPullsNumberMerge_755819(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Merge a pull request (Merge Button's)
   ## 
   var section: JsonNode
@@ -17598,9 +17540,9 @@ proc call*(call_755826: Call_PutReposOwnerRepoPullsNumberMerge_755818;
   let scheme = call_755826.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755826.url(scheme.get, call_755826.host, call_755826.base,
-                         call_755826.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755826.makeUrl(scheme.get, call_755826.host, call_755826.base,
+                             call_755826.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755826, uri, valid, _)
 
 proc call*(call_755827: Call_PutReposOwnerRepoPullsNumberMerge_755818; number: int;
@@ -17631,7 +17573,7 @@ var putReposOwnerRepoPullsNumberMerge* = Call_PutReposOwnerRepoPullsNumberMerge_
     name: "putReposOwnerRepoPullsNumberMerge", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls/{number}/merge",
     validator: validate_PutReposOwnerRepoPullsNumberMerge_755819, base: "/",
-    url: url_PutReposOwnerRepoPullsNumberMerge_755820, schemes: {Scheme.Https})
+    makeUrl: url_PutReposOwnerRepoPullsNumberMerge_755820, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoPullsNumberMerge_755807 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoPullsNumberMerge_755809(protocol: Scheme; host: string;
@@ -17663,7 +17605,7 @@ proc url_GetReposOwnerRepoPullsNumberMerge_755809(protocol: Scheme; host: string
 
 proc validate_GetReposOwnerRepoPullsNumberMerge_755808(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get if a pull request has been merged.
   ## 
   var section: JsonNode
@@ -17718,9 +17660,9 @@ proc call*(call_755814: Call_GetReposOwnerRepoPullsNumberMerge_755807;
   let scheme = call_755814.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755814.url(scheme.get, call_755814.host, call_755814.base,
-                         call_755814.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755814.makeUrl(scheme.get, call_755814.host, call_755814.base,
+                             call_755814.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755814, uri, valid, _)
 
 proc call*(call_755815: Call_GetReposOwnerRepoPullsNumberMerge_755807; number: int;
@@ -17747,7 +17689,7 @@ var getReposOwnerRepoPullsNumberMerge* = Call_GetReposOwnerRepoPullsNumberMerge_
     name: "getReposOwnerRepoPullsNumberMerge", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/pulls/{number}/merge",
     validator: validate_GetReposOwnerRepoPullsNumberMerge_755808, base: "/",
-    url: url_GetReposOwnerRepoPullsNumberMerge_755809, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoPullsNumberMerge_755809, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoReadme_755831 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoReadme_755833(protocol: Scheme; host: string; base: string;
@@ -17776,8 +17718,7 @@ proc url_GetReposOwnerRepoReadme_755833(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoReadme_755832(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get the README.
   ## This method returns the preferred README for a repository.
   ## 
@@ -17838,9 +17779,9 @@ proc call*(call_755838: Call_GetReposOwnerRepoReadme_755831; path: JsonNode = ni
   let scheme = call_755838.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755838.url(scheme.get, call_755838.host, call_755838.base,
-                         call_755838.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755838.makeUrl(scheme.get, call_755838.host, call_755838.base,
+                             call_755838.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755838, uri, valid, _)
 
 proc call*(call_755839: Call_GetReposOwnerRepoReadme_755831; repo: string;
@@ -17870,7 +17811,7 @@ var getReposOwnerRepoReadme* = Call_GetReposOwnerRepoReadme_755831(
     name: "getReposOwnerRepoReadme", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/readme",
     validator: validate_GetReposOwnerRepoReadme_755832, base: "/",
-    url: url_GetReposOwnerRepoReadme_755833, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoReadme_755833, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoReleases_755853 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoReleases_755855(protocol: Scheme; host: string;
@@ -17898,8 +17839,7 @@ proc url_PostReposOwnerRepoReleases_755855(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoReleases_755854(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a release
   ## Users with push access to the repository can create a release.
   ## 
@@ -17956,9 +17896,9 @@ proc call*(call_755860: Call_PostReposOwnerRepoReleases_755853;
   let scheme = call_755860.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755860.url(scheme.get, call_755860.host, call_755860.base,
-                         call_755860.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755860.makeUrl(scheme.get, call_755860.host, call_755860.base,
+                             call_755860.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755860, uri, valid, _)
 
 proc call*(call_755861: Call_PostReposOwnerRepoReleases_755853; repo: string;
@@ -17988,7 +17928,7 @@ var postReposOwnerRepoReleases* = Call_PostReposOwnerRepoReleases_755853(
     name: "postReposOwnerRepoReleases", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases",
     validator: validate_PostReposOwnerRepoReleases_755854, base: "/",
-    url: url_PostReposOwnerRepoReleases_755855, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoReleases_755855, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoReleases_755843 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoReleases_755845(protocol: Scheme; host: string;
@@ -18016,8 +17956,7 @@ proc url_GetReposOwnerRepoReleases_755845(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoReleases_755844(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Users with push access to the repository will receive all releases (i.e., published releases and draft releases). Users with pull access will receive published releases only
   ## 
   var section: JsonNode
@@ -18066,9 +18005,9 @@ proc call*(call_755849: Call_GetReposOwnerRepoReleases_755843;
   let scheme = call_755849.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755849.url(scheme.get, call_755849.host, call_755849.base,
-                         call_755849.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755849.makeUrl(scheme.get, call_755849.host, call_755849.base,
+                             call_755849.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755849, uri, valid, _)
 
 proc call*(call_755850: Call_GetReposOwnerRepoReleases_755843; repo: string;
@@ -18092,7 +18031,7 @@ var getReposOwnerRepoReleases* = Call_GetReposOwnerRepoReleases_755843(
     name: "getReposOwnerRepoReleases", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases",
     validator: validate_GetReposOwnerRepoReleases_755844, base: "/",
-    url: url_GetReposOwnerRepoReleases_755845, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoReleases_755845, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoReleasesAssetsId_755865 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoReleasesAssetsId_755867(protocol: Scheme; host: string;
@@ -18123,7 +18062,7 @@ proc url_GetReposOwnerRepoReleasesAssetsId_755867(protocol: Scheme; host: string
 
 proc validate_GetReposOwnerRepoReleasesAssetsId_755866(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get a single release asset
   ## 
   var section: JsonNode
@@ -18178,9 +18117,9 @@ proc call*(call_755872: Call_GetReposOwnerRepoReleasesAssetsId_755865;
   let scheme = call_755872.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755872.url(scheme.get, call_755872.host, call_755872.base,
-                         call_755872.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755872.makeUrl(scheme.get, call_755872.host, call_755872.base,
+                             call_755872.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755872, uri, valid, _)
 
 proc call*(call_755873: Call_GetReposOwnerRepoReleasesAssetsId_755865; id: string;
@@ -18206,7 +18145,7 @@ var getReposOwnerRepoReleasesAssetsId* = Call_GetReposOwnerRepoReleasesAssetsId_
     name: "getReposOwnerRepoReleasesAssetsId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases/assets/{id}",
     validator: validate_GetReposOwnerRepoReleasesAssetsId_755866, base: "/",
-    url: url_GetReposOwnerRepoReleasesAssetsId_755867, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoReleasesAssetsId_755867, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoReleasesAssetsId_755887 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoReleasesAssetsId_755889(protocol: Scheme; host: string;
@@ -18237,7 +18176,7 @@ proc url_PatchReposOwnerRepoReleasesAssetsId_755889(protocol: Scheme; host: stri
 
 proc validate_PatchReposOwnerRepoReleasesAssetsId_755888(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Edit a release asset
   ## Users with push access to the repository can edit a release asset.
   ## 
@@ -18300,9 +18239,9 @@ proc call*(call_755895: Call_PatchReposOwnerRepoReleasesAssetsId_755887;
   let scheme = call_755895.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755895.url(scheme.get, call_755895.host, call_755895.base,
-                         call_755895.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755895.makeUrl(scheme.get, call_755895.host, call_755895.base,
+                             call_755895.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755895, uri, valid, _)
 
 proc call*(call_755896: Call_PatchReposOwnerRepoReleasesAssetsId_755887;
@@ -18334,7 +18273,8 @@ var patchReposOwnerRepoReleasesAssetsId* = Call_PatchReposOwnerRepoReleasesAsset
     name: "patchReposOwnerRepoReleasesAssetsId", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases/assets/{id}",
     validator: validate_PatchReposOwnerRepoReleasesAssetsId_755888, base: "/",
-    url: url_PatchReposOwnerRepoReleasesAssetsId_755889, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoReleasesAssetsId_755889,
+    schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoReleasesAssetsId_755876 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoReleasesAssetsId_755878(protocol: Scheme;
@@ -18365,7 +18305,7 @@ proc url_DeleteReposOwnerRepoReleasesAssetsId_755878(protocol: Scheme;
 
 proc validate_DeleteReposOwnerRepoReleasesAssetsId_755877(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a release asset
   ## 
   var section: JsonNode
@@ -18420,9 +18360,9 @@ proc call*(call_755883: Call_DeleteReposOwnerRepoReleasesAssetsId_755876;
   let scheme = call_755883.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755883.url(scheme.get, call_755883.host, call_755883.base,
-                         call_755883.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755883.makeUrl(scheme.get, call_755883.host, call_755883.base,
+                             call_755883.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755883, uri, valid, _)
 
 proc call*(call_755884: Call_DeleteReposOwnerRepoReleasesAssetsId_755876;
@@ -18448,7 +18388,8 @@ var deleteReposOwnerRepoReleasesAssetsId* = Call_DeleteReposOwnerRepoReleasesAss
     name: "deleteReposOwnerRepoReleasesAssetsId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases/assets/{id}",
     validator: validate_DeleteReposOwnerRepoReleasesAssetsId_755877, base: "/",
-    url: url_DeleteReposOwnerRepoReleasesAssetsId_755878, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoReleasesAssetsId_755878,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoReleasesId_755900 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoReleasesId_755902(protocol: Scheme; host: string;
@@ -18478,8 +18419,7 @@ proc url_GetReposOwnerRepoReleasesId_755902(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoReleasesId_755901(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a single release
   ## 
   var section: JsonNode
@@ -18534,9 +18474,9 @@ proc call*(call_755907: Call_GetReposOwnerRepoReleasesId_755900;
   let scheme = call_755907.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755907.url(scheme.get, call_755907.host, call_755907.base,
-                         call_755907.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755907.makeUrl(scheme.get, call_755907.host, call_755907.base,
+                             call_755907.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755907, uri, valid, _)
 
 proc call*(call_755908: Call_GetReposOwnerRepoReleasesId_755900; id: string;
@@ -18562,7 +18502,7 @@ var getReposOwnerRepoReleasesId* = Call_GetReposOwnerRepoReleasesId_755900(
     name: "getReposOwnerRepoReleasesId", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases/{id}",
     validator: validate_GetReposOwnerRepoReleasesId_755901, base: "/",
-    url: url_GetReposOwnerRepoReleasesId_755902, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoReleasesId_755902, schemes: {Scheme.Https})
 type
   Call_PatchReposOwnerRepoReleasesId_755922 = ref object of OpenApiRestCall_753573
 proc url_PatchReposOwnerRepoReleasesId_755924(protocol: Scheme; host: string;
@@ -18592,8 +18532,7 @@ proc url_PatchReposOwnerRepoReleasesId_755924(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PatchReposOwnerRepoReleasesId_755923(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Users with push access to the repository can edit a release
   ## 
   var section: JsonNode
@@ -18652,9 +18591,9 @@ proc call*(call_755930: Call_PatchReposOwnerRepoReleasesId_755922;
   let scheme = call_755930.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755930.url(scheme.get, call_755930.host, call_755930.base,
-                         call_755930.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755930.makeUrl(scheme.get, call_755930.host, call_755930.base,
+                             call_755930.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755930, uri, valid, _)
 
 proc call*(call_755931: Call_PatchReposOwnerRepoReleasesId_755922; id: string;
@@ -18684,7 +18623,7 @@ var patchReposOwnerRepoReleasesId* = Call_PatchReposOwnerRepoReleasesId_755922(
     name: "patchReposOwnerRepoReleasesId", meth: HttpMethod.HttpPatch,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases/{id}",
     validator: validate_PatchReposOwnerRepoReleasesId_755923, base: "/",
-    url: url_PatchReposOwnerRepoReleasesId_755924, schemes: {Scheme.Https})
+    makeUrl: url_PatchReposOwnerRepoReleasesId_755924, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoReleasesId_755911 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoReleasesId_755913(protocol: Scheme; host: string;
@@ -18715,7 +18654,7 @@ proc url_DeleteReposOwnerRepoReleasesId_755913(protocol: Scheme; host: string;
 
 proc validate_DeleteReposOwnerRepoReleasesId_755912(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Users with push access to the repository can delete a release.
   ## 
   var section: JsonNode
@@ -18770,9 +18709,9 @@ proc call*(call_755918: Call_DeleteReposOwnerRepoReleasesId_755911;
   let scheme = call_755918.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755918.url(scheme.get, call_755918.host, call_755918.base,
-                         call_755918.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755918.makeUrl(scheme.get, call_755918.host, call_755918.base,
+                             call_755918.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755918, uri, valid, _)
 
 proc call*(call_755919: Call_DeleteReposOwnerRepoReleasesId_755911; id: string;
@@ -18798,7 +18737,7 @@ var deleteReposOwnerRepoReleasesId* = Call_DeleteReposOwnerRepoReleasesId_755911
     name: "deleteReposOwnerRepoReleasesId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases/{id}",
     validator: validate_DeleteReposOwnerRepoReleasesId_755912, base: "/",
-    url: url_DeleteReposOwnerRepoReleasesId_755913, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoReleasesId_755913, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoReleasesIdAssets_755935 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoReleasesIdAssets_755937(protocol: Scheme; host: string;
@@ -18830,7 +18769,7 @@ proc url_GetReposOwnerRepoReleasesIdAssets_755937(protocol: Scheme; host: string
 
 proc validate_GetReposOwnerRepoReleasesIdAssets_755936(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List assets for a release
   ## 
   var section: JsonNode
@@ -18885,9 +18824,9 @@ proc call*(call_755942: Call_GetReposOwnerRepoReleasesIdAssets_755935;
   let scheme = call_755942.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755942.url(scheme.get, call_755942.host, call_755942.base,
-                         call_755942.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755942.makeUrl(scheme.get, call_755942.host, call_755942.base,
+                             call_755942.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755942, uri, valid, _)
 
 proc call*(call_755943: Call_GetReposOwnerRepoReleasesIdAssets_755935; id: string;
@@ -18913,7 +18852,7 @@ var getReposOwnerRepoReleasesIdAssets* = Call_GetReposOwnerRepoReleasesIdAssets_
     name: "getReposOwnerRepoReleasesIdAssets", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/releases/{id}/assets",
     validator: validate_GetReposOwnerRepoReleasesIdAssets_755936, base: "/",
-    url: url_GetReposOwnerRepoReleasesIdAssets_755937, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoReleasesIdAssets_755937, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoStargazers_755946 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoStargazers_755948(protocol: Scheme; host: string;
@@ -18941,8 +18880,7 @@ proc url_GetReposOwnerRepoStargazers_755948(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoStargazers_755947(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List Stargazers.
   ## 
   var section: JsonNode
@@ -18991,9 +18929,9 @@ proc call*(call_755952: Call_GetReposOwnerRepoStargazers_755946;
   let scheme = call_755952.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755952.url(scheme.get, call_755952.host, call_755952.base,
-                         call_755952.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755952.makeUrl(scheme.get, call_755952.host, call_755952.base,
+                             call_755952.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755952, uri, valid, _)
 
 proc call*(call_755953: Call_GetReposOwnerRepoStargazers_755946; repo: string;
@@ -19017,7 +18955,7 @@ var getReposOwnerRepoStargazers* = Call_GetReposOwnerRepoStargazers_755946(
     name: "getReposOwnerRepoStargazers", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/stargazers",
     validator: validate_GetReposOwnerRepoStargazers_755947, base: "/",
-    url: url_GetReposOwnerRepoStargazers_755948, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoStargazers_755948, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoStatsCodeFrequency_755956 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoStatsCodeFrequency_755958(protocol: Scheme; host: string;
@@ -19046,7 +18984,7 @@ proc url_GetReposOwnerRepoStatsCodeFrequency_755958(protocol: Scheme; host: stri
 
 proc validate_GetReposOwnerRepoStatsCodeFrequency_755957(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get the number of additions and deletions per week.
   ## Returns a weekly aggregate of the number of additions and deletions pushed
   ## to a repository.
@@ -19101,9 +19039,9 @@ proc call*(call_755962: Call_GetReposOwnerRepoStatsCodeFrequency_755956;
   let scheme = call_755962.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755962.url(scheme.get, call_755962.host, call_755962.base,
-                         call_755962.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755962.makeUrl(scheme.get, call_755962.host, call_755962.base,
+                             call_755962.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755962, uri, valid, _)
 
 proc call*(call_755963: Call_GetReposOwnerRepoStatsCodeFrequency_755956;
@@ -19130,7 +19068,8 @@ var getReposOwnerRepoStatsCodeFrequency* = Call_GetReposOwnerRepoStatsCodeFreque
     name: "getReposOwnerRepoStatsCodeFrequency", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/stats/code_frequency",
     validator: validate_GetReposOwnerRepoStatsCodeFrequency_755957, base: "/",
-    url: url_GetReposOwnerRepoStatsCodeFrequency_755958, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoStatsCodeFrequency_755958,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoStatsCommitActivity_755966 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoStatsCommitActivity_755968(protocol: Scheme;
@@ -19159,7 +19098,7 @@ proc url_GetReposOwnerRepoStatsCommitActivity_755968(protocol: Scheme;
 
 proc validate_GetReposOwnerRepoStatsCommitActivity_755967(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get the last year of commit activity data.
   ## Returns the last year of commit activity grouped by week. The days array
   ## is a group of commits per day, starting on Sunday.
@@ -19214,9 +19153,9 @@ proc call*(call_755972: Call_GetReposOwnerRepoStatsCommitActivity_755966;
   let scheme = call_755972.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755972.url(scheme.get, call_755972.host, call_755972.base,
-                         call_755972.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755972.makeUrl(scheme.get, call_755972.host, call_755972.base,
+                             call_755972.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755972, uri, valid, _)
 
 proc call*(call_755973: Call_GetReposOwnerRepoStatsCommitActivity_755966;
@@ -19243,7 +19182,8 @@ var getReposOwnerRepoStatsCommitActivity* = Call_GetReposOwnerRepoStatsCommitAct
     name: "getReposOwnerRepoStatsCommitActivity", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/stats/commit_activity",
     validator: validate_GetReposOwnerRepoStatsCommitActivity_755967, base: "/",
-    url: url_GetReposOwnerRepoStatsCommitActivity_755968, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoStatsCommitActivity_755968,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoStatsContributors_755976 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoStatsContributors_755978(protocol: Scheme; host: string;
@@ -19272,7 +19212,7 @@ proc url_GetReposOwnerRepoStatsContributors_755978(protocol: Scheme; host: strin
 
 proc validate_GetReposOwnerRepoStatsContributors_755977(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get contributors list with additions, deletions, and commit counts.
   ## 
   var section: JsonNode
@@ -19321,9 +19261,9 @@ proc call*(call_755982: Call_GetReposOwnerRepoStatsContributors_755976;
   let scheme = call_755982.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755982.url(scheme.get, call_755982.host, call_755982.base,
-                         call_755982.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755982.makeUrl(scheme.get, call_755982.host, call_755982.base,
+                             call_755982.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755982, uri, valid, _)
 
 proc call*(call_755983: Call_GetReposOwnerRepoStatsContributors_755976;
@@ -19347,7 +19287,8 @@ var getReposOwnerRepoStatsContributors* = Call_GetReposOwnerRepoStatsContributor
     name: "getReposOwnerRepoStatsContributors", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/stats/contributors",
     validator: validate_GetReposOwnerRepoStatsContributors_755977, base: "/",
-    url: url_GetReposOwnerRepoStatsContributors_755978, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoStatsContributors_755978,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoStatsParticipation_755986 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoStatsParticipation_755988(protocol: Scheme; host: string;
@@ -19376,7 +19317,7 @@ proc url_GetReposOwnerRepoStatsParticipation_755988(protocol: Scheme; host: stri
 
 proc validate_GetReposOwnerRepoStatsParticipation_755987(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get the weekly commit count for the repo owner and everyone else.
   ## 
   var section: JsonNode
@@ -19425,9 +19366,9 @@ proc call*(call_755992: Call_GetReposOwnerRepoStatsParticipation_755986;
   let scheme = call_755992.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_755992.url(scheme.get, call_755992.host, call_755992.base,
-                         call_755992.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_755992.makeUrl(scheme.get, call_755992.host, call_755992.base,
+                             call_755992.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_755992, uri, valid, _)
 
 proc call*(call_755993: Call_GetReposOwnerRepoStatsParticipation_755986;
@@ -19451,7 +19392,8 @@ var getReposOwnerRepoStatsParticipation* = Call_GetReposOwnerRepoStatsParticipat
     name: "getReposOwnerRepoStatsParticipation", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/stats/participation",
     validator: validate_GetReposOwnerRepoStatsParticipation_755987, base: "/",
-    url: url_GetReposOwnerRepoStatsParticipation_755988, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoStatsParticipation_755988,
+    schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoStatsPunchCard_755996 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoStatsPunchCard_755998(protocol: Scheme; host: string;
@@ -19480,7 +19422,7 @@ proc url_GetReposOwnerRepoStatsPunchCard_755998(protocol: Scheme; host: string;
 
 proc validate_GetReposOwnerRepoStatsPunchCard_755997(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get the number of commits per hour in each day.
   ## Each array contains the day number, hour number, and number of commits
   ## 0-6 Sunday - Saturday
@@ -19547,9 +19489,9 @@ proc call*(call_756002: Call_GetReposOwnerRepoStatsPunchCard_755996;
   let scheme = call_756002.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756002.url(scheme.get, call_756002.host, call_756002.base,
-                         call_756002.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756002.makeUrl(scheme.get, call_756002.host, call_756002.base,
+                             call_756002.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756002, uri, valid, _)
 
 proc call*(call_756003: Call_GetReposOwnerRepoStatsPunchCard_755996; repo: string;
@@ -19582,7 +19524,7 @@ var getReposOwnerRepoStatsPunchCard* = Call_GetReposOwnerRepoStatsPunchCard_7559
     name: "getReposOwnerRepoStatsPunchCard", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/stats/punch_card",
     validator: validate_GetReposOwnerRepoStatsPunchCard_755997, base: "/",
-    url: url_GetReposOwnerRepoStatsPunchCard_755998, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoStatsPunchCard_755998, schemes: {Scheme.Https})
 type
   Call_PostReposOwnerRepoStatusesRef_756017 = ref object of OpenApiRestCall_753573
 proc url_PostReposOwnerRepoStatusesRef_756019(protocol: Scheme; host: string;
@@ -19612,8 +19554,7 @@ proc url_PostReposOwnerRepoStatusesRef_756019(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PostReposOwnerRepoStatusesRef_756018(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a Status.
   ## 
   var section: JsonNode
@@ -19674,9 +19615,9 @@ proc call*(call_756025: Call_PostReposOwnerRepoStatusesRef_756017;
   let scheme = call_756025.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756025.url(scheme.get, call_756025.host, call_756025.base,
-                         call_756025.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756025.makeUrl(scheme.get, call_756025.host, call_756025.base,
+                             call_756025.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756025, uri, valid, _)
 
 proc call*(call_756026: Call_PostReposOwnerRepoStatusesRef_756017; `ref`: string;
@@ -19708,7 +19649,7 @@ var postReposOwnerRepoStatusesRef* = Call_PostReposOwnerRepoStatusesRef_756017(
     name: "postReposOwnerRepoStatusesRef", meth: HttpMethod.HttpPost,
     host: "api.github.com", route: "/repos/{owner}/{repo}/statuses/{ref}",
     validator: validate_PostReposOwnerRepoStatusesRef_756018, base: "/",
-    url: url_PostReposOwnerRepoStatusesRef_756019, schemes: {Scheme.Https})
+    makeUrl: url_PostReposOwnerRepoStatusesRef_756019, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoStatusesRef_756006 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoStatusesRef_756008(protocol: Scheme; host: string;
@@ -19738,8 +19679,7 @@ proc url_GetReposOwnerRepoStatusesRef_756008(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoStatusesRef_756007(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List Statuses for a specific Ref.
   ## 
   var section: JsonNode
@@ -19796,9 +19736,9 @@ proc call*(call_756013: Call_GetReposOwnerRepoStatusesRef_756006;
   let scheme = call_756013.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756013.url(scheme.get, call_756013.host, call_756013.base,
-                         call_756013.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756013.makeUrl(scheme.get, call_756013.host, call_756013.base,
+                             call_756013.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756013, uri, valid, _)
 
 proc call*(call_756014: Call_GetReposOwnerRepoStatusesRef_756006; `ref`: string;
@@ -19826,7 +19766,7 @@ var getReposOwnerRepoStatusesRef* = Call_GetReposOwnerRepoStatusesRef_756006(
     name: "getReposOwnerRepoStatusesRef", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/statuses/{ref}",
     validator: validate_GetReposOwnerRepoStatusesRef_756007, base: "/",
-    url: url_GetReposOwnerRepoStatusesRef_756008, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoStatusesRef_756008, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoSubscribers_756030 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoSubscribers_756032(protocol: Scheme; host: string;
@@ -19854,8 +19794,7 @@ proc url_GetReposOwnerRepoSubscribers_756032(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoSubscribers_756031(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List watchers.
   ## 
   var section: JsonNode
@@ -19904,9 +19843,9 @@ proc call*(call_756036: Call_GetReposOwnerRepoSubscribers_756030;
   let scheme = call_756036.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756036.url(scheme.get, call_756036.host, call_756036.base,
-                         call_756036.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756036.makeUrl(scheme.get, call_756036.host, call_756036.base,
+                             call_756036.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756036, uri, valid, _)
 
 proc call*(call_756037: Call_GetReposOwnerRepoSubscribers_756030; repo: string;
@@ -19930,7 +19869,7 @@ var getReposOwnerRepoSubscribers* = Call_GetReposOwnerRepoSubscribers_756030(
     name: "getReposOwnerRepoSubscribers", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/subscribers",
     validator: validate_GetReposOwnerRepoSubscribers_756031, base: "/",
-    url: url_GetReposOwnerRepoSubscribers_756032, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoSubscribers_756032, schemes: {Scheme.Https})
 type
   Call_PutReposOwnerRepoSubscription_756050 = ref object of OpenApiRestCall_753573
 proc url_PutReposOwnerRepoSubscription_756052(protocol: Scheme; host: string;
@@ -19958,8 +19897,7 @@ proc url_PutReposOwnerRepoSubscription_756052(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PutReposOwnerRepoSubscription_756051(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Set a Repository Subscription
   ## 
   var section: JsonNode
@@ -20012,9 +19950,9 @@ proc call*(call_756057: Call_PutReposOwnerRepoSubscription_756050;
   let scheme = call_756057.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756057.url(scheme.get, call_756057.host, call_756057.base,
-                         call_756057.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756057.makeUrl(scheme.get, call_756057.host, call_756057.base,
+                             call_756057.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756057, uri, valid, _)
 
 proc call*(call_756058: Call_PutReposOwnerRepoSubscription_756050; repo: string;
@@ -20042,7 +19980,7 @@ var putReposOwnerRepoSubscription* = Call_PutReposOwnerRepoSubscription_756050(
     name: "putReposOwnerRepoSubscription", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/repos/{owner}/{repo}/subscription",
     validator: validate_PutReposOwnerRepoSubscription_756051, base: "/",
-    url: url_PutReposOwnerRepoSubscription_756052, schemes: {Scheme.Https})
+    makeUrl: url_PutReposOwnerRepoSubscription_756052, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoSubscription_756040 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoSubscription_756042(protocol: Scheme; host: string;
@@ -20070,8 +20008,7 @@ proc url_GetReposOwnerRepoSubscription_756042(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoSubscription_756041(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get a Repository Subscription.
   ## 
   var section: JsonNode
@@ -20120,9 +20057,9 @@ proc call*(call_756046: Call_GetReposOwnerRepoSubscription_756040;
   let scheme = call_756046.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756046.url(scheme.get, call_756046.host, call_756046.base,
-                         call_756046.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756046.makeUrl(scheme.get, call_756046.host, call_756046.base,
+                             call_756046.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756046, uri, valid, _)
 
 proc call*(call_756047: Call_GetReposOwnerRepoSubscription_756040; repo: string;
@@ -20146,7 +20083,7 @@ var getReposOwnerRepoSubscription* = Call_GetReposOwnerRepoSubscription_756040(
     name: "getReposOwnerRepoSubscription", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/subscription",
     validator: validate_GetReposOwnerRepoSubscription_756041, base: "/",
-    url: url_GetReposOwnerRepoSubscription_756042, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoSubscription_756042, schemes: {Scheme.Https})
 type
   Call_DeleteReposOwnerRepoSubscription_756062 = ref object of OpenApiRestCall_753573
 proc url_DeleteReposOwnerRepoSubscription_756064(protocol: Scheme; host: string;
@@ -20175,7 +20112,7 @@ proc url_DeleteReposOwnerRepoSubscription_756064(protocol: Scheme; host: string;
 
 proc validate_DeleteReposOwnerRepoSubscription_756063(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Delete a Repository Subscription.
   ## 
   var section: JsonNode
@@ -20224,9 +20161,9 @@ proc call*(call_756068: Call_DeleteReposOwnerRepoSubscription_756062;
   let scheme = call_756068.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756068.url(scheme.get, call_756068.host, call_756068.base,
-                         call_756068.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756068.makeUrl(scheme.get, call_756068.host, call_756068.base,
+                             call_756068.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756068, uri, valid, _)
 
 proc call*(call_756069: Call_DeleteReposOwnerRepoSubscription_756062; repo: string;
@@ -20250,7 +20187,7 @@ var deleteReposOwnerRepoSubscription* = Call_DeleteReposOwnerRepoSubscription_75
     name: "deleteReposOwnerRepoSubscription", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/repos/{owner}/{repo}/subscription",
     validator: validate_DeleteReposOwnerRepoSubscription_756063, base: "/",
-    url: url_DeleteReposOwnerRepoSubscription_756064, schemes: {Scheme.Https})
+    makeUrl: url_DeleteReposOwnerRepoSubscription_756064, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoTags_756072 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoTags_756074(protocol: Scheme; host: string; base: string;
@@ -20278,8 +20215,7 @@ proc url_GetReposOwnerRepoTags_756074(protocol: Scheme; host: string; base: stri
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoTags_756073(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get list of tags.
   ## 
   var section: JsonNode
@@ -20328,9 +20264,9 @@ proc call*(call_756078: Call_GetReposOwnerRepoTags_756072; path: JsonNode = nil;
   let scheme = call_756078.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756078.url(scheme.get, call_756078.host, call_756078.base,
-                         call_756078.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756078.makeUrl(scheme.get, call_756078.host, call_756078.base,
+                             call_756078.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756078, uri, valid, _)
 
 proc call*(call_756079: Call_GetReposOwnerRepoTags_756072; repo: string;
@@ -20354,7 +20290,7 @@ var getReposOwnerRepoTags* = Call_GetReposOwnerRepoTags_756072(
     name: "getReposOwnerRepoTags", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/repos/{owner}/{repo}/tags",
     validator: validate_GetReposOwnerRepoTags_756073, base: "/",
-    url: url_GetReposOwnerRepoTags_756074, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoTags_756074, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoTeams_756082 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoTeams_756084(protocol: Scheme; host: string; base: string;
@@ -20382,8 +20318,7 @@ proc url_GetReposOwnerRepoTeams_756084(protocol: Scheme; host: string; base: str
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoTeams_756083(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get list of teams
   ## 
   var section: JsonNode
@@ -20432,9 +20367,9 @@ proc call*(call_756088: Call_GetReposOwnerRepoTeams_756082; path: JsonNode = nil
   let scheme = call_756088.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756088.url(scheme.get, call_756088.host, call_756088.base,
-                         call_756088.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756088.makeUrl(scheme.get, call_756088.host, call_756088.base,
+                             call_756088.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756088, uri, valid, _)
 
 proc call*(call_756089: Call_GetReposOwnerRepoTeams_756082; repo: string;
@@ -20458,7 +20393,7 @@ var getReposOwnerRepoTeams* = Call_GetReposOwnerRepoTeams_756082(
     name: "getReposOwnerRepoTeams", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/teams",
     validator: validate_GetReposOwnerRepoTeams_756083, base: "/",
-    url: url_GetReposOwnerRepoTeams_756084, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoTeams_756084, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoWatchers_756092 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoWatchers_756094(protocol: Scheme; host: string;
@@ -20486,8 +20421,7 @@ proc url_GetReposOwnerRepoWatchers_756094(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetReposOwnerRepoWatchers_756093(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List Stargazers. New implementation.
   ## 
   var section: JsonNode
@@ -20536,9 +20470,9 @@ proc call*(call_756098: Call_GetReposOwnerRepoWatchers_756092;
   let scheme = call_756098.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756098.url(scheme.get, call_756098.host, call_756098.base,
-                         call_756098.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756098.makeUrl(scheme.get, call_756098.host, call_756098.base,
+                             call_756098.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756098, uri, valid, _)
 
 proc call*(call_756099: Call_GetReposOwnerRepoWatchers_756092; repo: string;
@@ -20562,7 +20496,7 @@ var getReposOwnerRepoWatchers* = Call_GetReposOwnerRepoWatchers_756092(
     name: "getReposOwnerRepoWatchers", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/repos/{owner}/{repo}/watchers",
     validator: validate_GetReposOwnerRepoWatchers_756093, base: "/",
-    url: url_GetReposOwnerRepoWatchers_756094, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoWatchers_756094, schemes: {Scheme.Https})
 type
   Call_GetReposOwnerRepoArchiveFormatPath_756102 = ref object of OpenApiRestCall_753573
 proc url_GetReposOwnerRepoArchiveFormatPath_756104(protocol: Scheme; host: string;
@@ -20596,7 +20530,7 @@ proc url_GetReposOwnerRepoArchiveFormatPath_756104(protocol: Scheme; host: strin
 
 proc validate_GetReposOwnerRepoArchiveFormatPath_756103(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get archive link.
   ## This method will return a 302 to a URL to download a tarball or zipball
   ## archive for a repository. Please make sure your HTTP framework is
@@ -20669,9 +20603,9 @@ proc call*(call_756110: Call_GetReposOwnerRepoArchiveFormatPath_756102;
   let scheme = call_756110.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756110.url(scheme.get, call_756110.host, call_756110.base,
-                         call_756110.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756110.makeUrl(scheme.get, call_756110.host, call_756110.base,
+                             call_756110.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756110, uri, valid, _)
 
 proc call*(call_756111: Call_GetReposOwnerRepoArchiveFormatPath_756102;
@@ -20708,7 +20642,8 @@ var getReposOwnerRepoArchiveFormatPath* = Call_GetReposOwnerRepoArchiveFormatPat
     host: "api.github.com",
     route: "/repos/{owner}/{repo}/{archive_format}/{path}",
     validator: validate_GetReposOwnerRepoArchiveFormatPath_756103, base: "/",
-    url: url_GetReposOwnerRepoArchiveFormatPath_756104, schemes: {Scheme.Https})
+    makeUrl: url_GetReposOwnerRepoArchiveFormatPath_756104,
+    schemes: {Scheme.Https})
 type
   Call_GetRepositories_756114 = ref object of OpenApiRestCall_753573
 proc url_GetRepositories_756116(protocol: Scheme; host: string; base: string;
@@ -20724,7 +20659,7 @@ proc url_GetRepositories_756116(protocol: Scheme; host: string; base: string;
 
 proc validate_GetRepositories_756115(path: JsonNode; query: JsonNode;
                                     header: JsonNode; formData: JsonNode;
-                                    body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                    body: JsonNode; _: string = ""): JsonNode =
   ## List all public repositories.
   ## This provides a dump of every public repository, in the order that they
   ## were created.
@@ -20777,9 +20712,9 @@ proc call*(call_756119: Call_GetRepositories_756114; path: JsonNode = nil;
   let scheme = call_756119.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756119.url(scheme.get, call_756119.host, call_756119.base,
-                         call_756119.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756119.makeUrl(scheme.get, call_756119.host, call_756119.base,
+                             call_756119.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756119, uri, valid, _)
 
 proc call*(call_756120: Call_GetRepositories_756114; since: string = "";
@@ -20805,8 +20740,8 @@ proc call*(call_756120: Call_GetRepositories_756114; since: string = "";
 
 var getRepositories* = Call_GetRepositories_756114(name: "getRepositories",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/repositories",
-    validator: validate_GetRepositories_756115, base: "/", url: url_GetRepositories_756116,
-    schemes: {Scheme.Https})
+    validator: validate_GetRepositories_756115, base: "/",
+    makeUrl: url_GetRepositories_756116, schemes: {Scheme.Https})
 type
   Call_GetSearchCode_756123 = ref object of OpenApiRestCall_753573
 proc url_GetSearchCode_756125(protocol: Scheme; host: string; base: string;
@@ -20821,8 +20756,7 @@ proc url_GetSearchCode_756125(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetSearchCode_756124(path: JsonNode; query: JsonNode; header: JsonNode;
-                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Search code.
   ## 
   var section: JsonNode
@@ -20894,9 +20828,9 @@ proc call*(call_756130: Call_GetSearchCode_756123; path: JsonNode = nil;
   let scheme = call_756130.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756130.url(scheme.get, call_756130.host, call_756130.base,
-                         call_756130.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756130.makeUrl(scheme.get, call_756130.host, call_756130.base,
+                             call_756130.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756130, uri, valid, _)
 
 proc call*(call_756131: Call_GetSearchCode_756123; q: string;
@@ -20937,7 +20871,7 @@ proc call*(call_756131: Call_GetSearchCode_756123; q: string;
 
 var getSearchCode* = Call_GetSearchCode_756123(name: "getSearchCode",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/search/code",
-    validator: validate_GetSearchCode_756124, base: "/", url: url_GetSearchCode_756125,
+    validator: validate_GetSearchCode_756124, base: "/", makeUrl: url_GetSearchCode_756125,
     schemes: {Scheme.Https})
 type
   Call_GetSearchIssues_756134 = ref object of OpenApiRestCall_753573
@@ -20954,7 +20888,7 @@ proc url_GetSearchIssues_756136(protocol: Scheme; host: string; base: string;
 
 proc validate_GetSearchIssues_756135(path: JsonNode; query: JsonNode;
                                     header: JsonNode; formData: JsonNode;
-                                    body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                    body: JsonNode; _: string = ""): JsonNode =
   ## Find issues by state and keyword. (This method returns up to 100 results per page.)
   ## 
   var section: JsonNode
@@ -21010,9 +20944,9 @@ proc call*(call_756141: Call_GetSearchIssues_756134; path: JsonNode = nil;
   let scheme = call_756141.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756141.url(scheme.get, call_756141.host, call_756141.base,
-                         call_756141.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756141.makeUrl(scheme.get, call_756141.host, call_756141.base,
+                             call_756141.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756141, uri, valid, _)
 
 proc call*(call_756142: Call_GetSearchIssues_756134; q: string;
@@ -21037,8 +20971,8 @@ proc call*(call_756142: Call_GetSearchIssues_756134; q: string;
 
 var getSearchIssues* = Call_GetSearchIssues_756134(name: "getSearchIssues",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/search/issues",
-    validator: validate_GetSearchIssues_756135, base: "/", url: url_GetSearchIssues_756136,
-    schemes: {Scheme.Https})
+    validator: validate_GetSearchIssues_756135, base: "/",
+    makeUrl: url_GetSearchIssues_756136, schemes: {Scheme.Https})
 type
   Call_GetSearchRepositories_756145 = ref object of OpenApiRestCall_753573
 proc url_GetSearchRepositories_756147(protocol: Scheme; host: string; base: string;
@@ -21053,8 +20987,7 @@ proc url_GetSearchRepositories_756147(protocol: Scheme; host: string; base: stri
     result.path = base & route
 
 proc validate_GetSearchRepositories_756146(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Search repositories.
   ## 
   var section: JsonNode
@@ -21123,9 +21056,9 @@ proc call*(call_756152: Call_GetSearchRepositories_756145; path: JsonNode = nil;
   let scheme = call_756152.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756152.url(scheme.get, call_756152.host, call_756152.base,
-                         call_756152.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756152.makeUrl(scheme.get, call_756152.host, call_756152.base,
+                             call_756152.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756152, uri, valid, _)
 
 proc call*(call_756153: Call_GetSearchRepositories_756145; q: string;
@@ -21164,7 +21097,7 @@ proc call*(call_756153: Call_GetSearchRepositories_756145; q: string;
 var getSearchRepositories* = Call_GetSearchRepositories_756145(
     name: "getSearchRepositories", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/search/repositories", validator: validate_GetSearchRepositories_756146,
-    base: "/", url: url_GetSearchRepositories_756147, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetSearchRepositories_756147, schemes: {Scheme.Https})
 type
   Call_GetSearchUsers_756156 = ref object of OpenApiRestCall_753573
 proc url_GetSearchUsers_756158(protocol: Scheme; host: string; base: string;
@@ -21180,7 +21113,7 @@ proc url_GetSearchUsers_756158(protocol: Scheme; host: string; base: string;
 
 proc validate_GetSearchUsers_756157(path: JsonNode; query: JsonNode;
                                    header: JsonNode; formData: JsonNode;
-                                   body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                   body: JsonNode; _: string = ""): JsonNode =
   ## Search users.
   ## 
   var section: JsonNode
@@ -21248,9 +21181,9 @@ proc call*(call_756163: Call_GetSearchUsers_756156; path: JsonNode = nil;
   let scheme = call_756163.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756163.url(scheme.get, call_756163.host, call_756163.base,
-                         call_756163.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756163.makeUrl(scheme.get, call_756163.host, call_756163.base,
+                             call_756163.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756163, uri, valid, _)
 
 proc call*(call_756164: Call_GetSearchUsers_756156; q: string;
@@ -21287,8 +21220,8 @@ proc call*(call_756164: Call_GetSearchUsers_756156; q: string;
 
 var getSearchUsers* = Call_GetSearchUsers_756156(name: "getSearchUsers",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/search/users",
-    validator: validate_GetSearchUsers_756157, base: "/", url: url_GetSearchUsers_756158,
-    schemes: {Scheme.Https})
+    validator: validate_GetSearchUsers_756157, base: "/",
+    makeUrl: url_GetSearchUsers_756158, schemes: {Scheme.Https})
 type
   Call_GetTeamsTeamId_756167 = ref object of OpenApiRestCall_753573
 proc url_GetTeamsTeamId_756169(protocol: Scheme; host: string; base: string;
@@ -21313,7 +21246,7 @@ proc url_GetTeamsTeamId_756169(protocol: Scheme; host: string; base: string;
 
 proc validate_GetTeamsTeamId_756168(path: JsonNode; query: JsonNode;
                                    header: JsonNode; formData: JsonNode;
-                                   body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                   body: JsonNode; _: string = ""): JsonNode =
   ## Get team.
   ## 
   var section: JsonNode
@@ -21354,9 +21287,9 @@ proc call*(call_756172: Call_GetTeamsTeamId_756167; path: JsonNode = nil;
   let scheme = call_756172.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756172.url(scheme.get, call_756172.host, call_756172.base,
-                         call_756172.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756172.makeUrl(scheme.get, call_756172.host, call_756172.base,
+                             call_756172.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756172, uri, valid, _)
 
 proc call*(call_756173: Call_GetTeamsTeamId_756167; teamId: int; Accept: string = ""): Recallable =
@@ -21374,8 +21307,8 @@ proc call*(call_756173: Call_GetTeamsTeamId_756167; teamId: int; Accept: string 
 
 var getTeamsTeamId* = Call_GetTeamsTeamId_756167(name: "getTeamsTeamId",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/teams/{teamId}",
-    validator: validate_GetTeamsTeamId_756168, base: "/", url: url_GetTeamsTeamId_756169,
-    schemes: {Scheme.Https})
+    validator: validate_GetTeamsTeamId_756168, base: "/",
+    makeUrl: url_GetTeamsTeamId_756169, schemes: {Scheme.Https})
 type
   Call_PatchTeamsTeamId_756185 = ref object of OpenApiRestCall_753573
 proc url_PatchTeamsTeamId_756187(protocol: Scheme; host: string; base: string;
@@ -21400,8 +21333,7 @@ proc url_PatchTeamsTeamId_756187(protocol: Scheme; host: string; base: string;
 
 proc validate_PatchTeamsTeamId_756186(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Edit team.
   ## In order to edit a team, the authenticated user must be an owner of the org
   ## that the team is associated with.
@@ -21452,9 +21384,9 @@ proc call*(call_756191: Call_PatchTeamsTeamId_756185; path: JsonNode = nil;
   let scheme = call_756191.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756191.url(scheme.get, call_756191.host, call_756191.base,
-                         call_756191.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756191.makeUrl(scheme.get, call_756191.host, call_756191.base,
+                             call_756191.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756191, uri, valid, _)
 
 proc call*(call_756192: Call_PatchTeamsTeamId_756185; teamId: int; body: JsonNode;
@@ -21481,7 +21413,7 @@ proc call*(call_756192: Call_PatchTeamsTeamId_756185; teamId: int; body: JsonNod
 var patchTeamsTeamId* = Call_PatchTeamsTeamId_756185(name: "patchTeamsTeamId",
     meth: HttpMethod.HttpPatch, host: "api.github.com", route: "/teams/{teamId}",
     validator: validate_PatchTeamsTeamId_756186, base: "/",
-    url: url_PatchTeamsTeamId_756187, schemes: {Scheme.Https})
+    makeUrl: url_PatchTeamsTeamId_756187, schemes: {Scheme.Https})
 type
   Call_DeleteTeamsTeamId_756176 = ref object of OpenApiRestCall_753573
 proc url_DeleteTeamsTeamId_756178(protocol: Scheme; host: string; base: string;
@@ -21506,8 +21438,7 @@ proc url_DeleteTeamsTeamId_756178(protocol: Scheme; host: string; base: string;
 
 proc validate_DeleteTeamsTeamId_756177(path: JsonNode; query: JsonNode;
                                       header: JsonNode; formData: JsonNode;
-                                      body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                      body: JsonNode; _: string = ""): JsonNode =
   ## Delete team.
   ## In order to delete a team, the authenticated user must be an owner of the
   ## org that the team is associated with.
@@ -21554,9 +21485,9 @@ proc call*(call_756181: Call_DeleteTeamsTeamId_756176; path: JsonNode = nil;
   let scheme = call_756181.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756181.url(scheme.get, call_756181.host, call_756181.base,
-                         call_756181.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756181.makeUrl(scheme.get, call_756181.host, call_756181.base,
+                             call_756181.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756181, uri, valid, _)
 
 proc call*(call_756182: Call_DeleteTeamsTeamId_756176; teamId: int;
@@ -21579,7 +21510,7 @@ proc call*(call_756182: Call_DeleteTeamsTeamId_756176; teamId: int;
 var deleteTeamsTeamId* = Call_DeleteTeamsTeamId_756176(name: "deleteTeamsTeamId",
     meth: HttpMethod.HttpDelete, host: "api.github.com", route: "/teams/{teamId}",
     validator: validate_DeleteTeamsTeamId_756177, base: "/",
-    url: url_DeleteTeamsTeamId_756178, schemes: {Scheme.Https})
+    makeUrl: url_DeleteTeamsTeamId_756178, schemes: {Scheme.Https})
 type
   Call_GetTeamsTeamIdMembers_756196 = ref object of OpenApiRestCall_753573
 proc url_GetTeamsTeamIdMembers_756198(protocol: Scheme; host: string; base: string;
@@ -21604,8 +21535,7 @@ proc url_GetTeamsTeamIdMembers_756198(protocol: Scheme; host: string; base: stri
     result.path = base & hydrated.get
 
 proc validate_GetTeamsTeamIdMembers_756197(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List team members.
   ## In order to list members in a team, the authenticated user must be a member
   ## of the team.
@@ -21652,9 +21582,9 @@ proc call*(call_756201: Call_GetTeamsTeamIdMembers_756196; path: JsonNode = nil;
   let scheme = call_756201.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756201.url(scheme.get, call_756201.host, call_756201.base,
-                         call_756201.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756201.makeUrl(scheme.get, call_756201.host, call_756201.base,
+                             call_756201.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756201, uri, valid, _)
 
 proc call*(call_756202: Call_GetTeamsTeamIdMembers_756196; teamId: int;
@@ -21677,7 +21607,7 @@ proc call*(call_756202: Call_GetTeamsTeamIdMembers_756196; teamId: int;
 var getTeamsTeamIdMembers* = Call_GetTeamsTeamIdMembers_756196(
     name: "getTeamsTeamIdMembers", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/teams/{teamId}/members", validator: validate_GetTeamsTeamIdMembers_756197,
-    base: "/", url: url_GetTeamsTeamIdMembers_756198, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetTeamsTeamIdMembers_756198, schemes: {Scheme.Https})
 type
   Call_PutTeamsTeamIdMembersUsername_756215 = ref object of OpenApiRestCall_753573
 proc url_PutTeamsTeamIdMembersUsername_756217(protocol: Scheme; host: string;
@@ -21704,8 +21634,7 @@ proc url_PutTeamsTeamIdMembersUsername_756217(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PutTeamsTeamIdMembersUsername_756216(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## The API (described below) is deprecated and is scheduled for removal in the next major version of the API. We recommend using the Add team membership API instead. It allows you to invite new organization members to your teams.
   ## 
   ## Add team member.
@@ -21765,9 +21694,9 @@ proc call*(call_756221: Call_PutTeamsTeamIdMembersUsername_756215;
   let scheme = call_756221.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756221.url(scheme.get, call_756221.host, call_756221.base,
-                         call_756221.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756221.makeUrl(scheme.get, call_756221.host, call_756221.base,
+                             call_756221.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756221, uri, valid, _)
 
 proc call*(call_756222: Call_PutTeamsTeamIdMembersUsername_756215;
@@ -21797,7 +21726,7 @@ var putTeamsTeamIdMembersUsername* = Call_PutTeamsTeamIdMembersUsername_756215(
     name: "putTeamsTeamIdMembersUsername", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/teams/{teamId}/members/{username}",
     validator: validate_PutTeamsTeamIdMembersUsername_756216, base: "/",
-    url: url_PutTeamsTeamIdMembersUsername_756217, schemes: {Scheme.Https})
+    makeUrl: url_PutTeamsTeamIdMembersUsername_756217, schemes: {Scheme.Https})
 type
   Call_GetTeamsTeamIdMembersUsername_756205 = ref object of OpenApiRestCall_753573
 proc url_GetTeamsTeamIdMembersUsername_756207(protocol: Scheme; host: string;
@@ -21824,8 +21753,7 @@ proc url_GetTeamsTeamIdMembersUsername_756207(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetTeamsTeamIdMembersUsername_756206(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## The "Get team member" API is deprecated and is scheduled for removal in the next major version of the API. We recommend using the Get team membership API instead. It allows you to get both active and pending memberships.
   ## 
   ## Get team member.
@@ -21883,9 +21811,9 @@ proc call*(call_756211: Call_GetTeamsTeamIdMembersUsername_756205;
   let scheme = call_756211.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756211.url(scheme.get, call_756211.host, call_756211.base,
-                         call_756211.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756211.makeUrl(scheme.get, call_756211.host, call_756211.base,
+                             call_756211.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756211, uri, valid, _)
 
 proc call*(call_756212: Call_GetTeamsTeamIdMembersUsername_756205;
@@ -21914,7 +21842,7 @@ var getTeamsTeamIdMembersUsername* = Call_GetTeamsTeamIdMembersUsername_756205(
     name: "getTeamsTeamIdMembersUsername", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/teams/{teamId}/members/{username}",
     validator: validate_GetTeamsTeamIdMembersUsername_756206, base: "/",
-    url: url_GetTeamsTeamIdMembersUsername_756207, schemes: {Scheme.Https})
+    makeUrl: url_GetTeamsTeamIdMembersUsername_756207, schemes: {Scheme.Https})
 type
   Call_DeleteTeamsTeamIdMembersUsername_756225 = ref object of OpenApiRestCall_753573
 proc url_DeleteTeamsTeamIdMembersUsername_756227(protocol: Scheme; host: string;
@@ -21942,7 +21870,7 @@ proc url_DeleteTeamsTeamIdMembersUsername_756227(protocol: Scheme; host: string;
 
 proc validate_DeleteTeamsTeamIdMembersUsername_756226(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## The "Remove team member" API is deprecated and is scheduled for removal in the next major version of the API. We recommend using the Remove team membership API instead. It allows you to remove both active and pending memberships.
   ## 
   ## Remove team member.
@@ -22004,9 +21932,9 @@ proc call*(call_756231: Call_DeleteTeamsTeamIdMembersUsername_756225;
   let scheme = call_756231.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756231.url(scheme.get, call_756231.host, call_756231.base,
-                         call_756231.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756231.makeUrl(scheme.get, call_756231.host, call_756231.base,
+                             call_756231.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756231, uri, valid, _)
 
 proc call*(call_756232: Call_DeleteTeamsTeamIdMembersUsername_756225;
@@ -22037,7 +21965,7 @@ var deleteTeamsTeamIdMembersUsername* = Call_DeleteTeamsTeamIdMembersUsername_75
     name: "deleteTeamsTeamIdMembersUsername", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/teams/{teamId}/members/{username}",
     validator: validate_DeleteTeamsTeamIdMembersUsername_756226, base: "/",
-    url: url_DeleteTeamsTeamIdMembersUsername_756227, schemes: {Scheme.Https})
+    makeUrl: url_DeleteTeamsTeamIdMembersUsername_756227, schemes: {Scheme.Https})
 type
   Call_PutTeamsTeamIdMembershipsUsername_756245 = ref object of OpenApiRestCall_753573
 proc url_PutTeamsTeamIdMembershipsUsername_756247(protocol: Scheme; host: string;
@@ -22065,7 +21993,7 @@ proc url_PutTeamsTeamIdMembershipsUsername_756247(protocol: Scheme; host: string
 
 proc validate_PutTeamsTeamIdMembershipsUsername_756246(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Add team membership.
   ## In order to add a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with.
   ## 
@@ -22125,9 +22053,9 @@ proc call*(call_756251: Call_PutTeamsTeamIdMembershipsUsername_756245;
   let scheme = call_756251.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756251.url(scheme.get, call_756251.host, call_756251.base,
-                         call_756251.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756251.makeUrl(scheme.get, call_756251.host, call_756251.base,
+                             call_756251.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756251, uri, valid, _)
 
 proc call*(call_756252: Call_PutTeamsTeamIdMembershipsUsername_756245;
@@ -22157,7 +22085,7 @@ var putTeamsTeamIdMembershipsUsername* = Call_PutTeamsTeamIdMembershipsUsername_
     name: "putTeamsTeamIdMembershipsUsername", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/teams/{teamId}/memberships/{username}",
     validator: validate_PutTeamsTeamIdMembershipsUsername_756246, base: "/",
-    url: url_PutTeamsTeamIdMembershipsUsername_756247, schemes: {Scheme.Https})
+    makeUrl: url_PutTeamsTeamIdMembershipsUsername_756247, schemes: {Scheme.Https})
 type
   Call_GetTeamsTeamIdMembershipsUsername_756235 = ref object of OpenApiRestCall_753573
 proc url_GetTeamsTeamIdMembershipsUsername_756237(protocol: Scheme; host: string;
@@ -22185,7 +22113,7 @@ proc url_GetTeamsTeamIdMembershipsUsername_756237(protocol: Scheme; host: string
 
 proc validate_GetTeamsTeamIdMembershipsUsername_756236(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Get team membership.
   ## In order to get a user's membership with a team, the authenticated user must be a member of the team or an owner of the team's organization.
   ## 
@@ -22237,9 +22165,9 @@ proc call*(call_756241: Call_GetTeamsTeamIdMembershipsUsername_756235;
   let scheme = call_756241.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756241.url(scheme.get, call_756241.host, call_756241.base,
-                         call_756241.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756241.makeUrl(scheme.get, call_756241.host, call_756241.base,
+                             call_756241.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756241, uri, valid, _)
 
 proc call*(call_756242: Call_GetTeamsTeamIdMembershipsUsername_756235;
@@ -22265,7 +22193,7 @@ var getTeamsTeamIdMembershipsUsername* = Call_GetTeamsTeamIdMembershipsUsername_
     name: "getTeamsTeamIdMembershipsUsername", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/teams/{teamId}/memberships/{username}",
     validator: validate_GetTeamsTeamIdMembershipsUsername_756236, base: "/",
-    url: url_GetTeamsTeamIdMembershipsUsername_756237, schemes: {Scheme.Https})
+    makeUrl: url_GetTeamsTeamIdMembershipsUsername_756237, schemes: {Scheme.Https})
 type
   Call_DeleteTeamsTeamIdMembershipsUsername_756255 = ref object of OpenApiRestCall_753573
 proc url_DeleteTeamsTeamIdMembershipsUsername_756257(protocol: Scheme;
@@ -22293,7 +22221,7 @@ proc url_DeleteTeamsTeamIdMembershipsUsername_756257(protocol: Scheme;
 
 proc validate_DeleteTeamsTeamIdMembershipsUsername_756256(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Remove team membership.
   ## In order to remove a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with. NOTE: This does not delete the user, it just removes their membership from the team.
   ## 
@@ -22345,9 +22273,9 @@ proc call*(call_756261: Call_DeleteTeamsTeamIdMembershipsUsername_756255;
   let scheme = call_756261.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756261.url(scheme.get, call_756261.host, call_756261.base,
-                         call_756261.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756261.makeUrl(scheme.get, call_756261.host, call_756261.base,
+                             call_756261.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756261, uri, valid, _)
 
 proc call*(call_756262: Call_DeleteTeamsTeamIdMembershipsUsername_756255;
@@ -22373,7 +22301,8 @@ var deleteTeamsTeamIdMembershipsUsername* = Call_DeleteTeamsTeamIdMembershipsUse
     name: "deleteTeamsTeamIdMembershipsUsername", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/teams/{teamId}/memberships/{username}",
     validator: validate_DeleteTeamsTeamIdMembershipsUsername_756256, base: "/",
-    url: url_DeleteTeamsTeamIdMembershipsUsername_756257, schemes: {Scheme.Https})
+    makeUrl: url_DeleteTeamsTeamIdMembershipsUsername_756257,
+    schemes: {Scheme.Https})
 type
   Call_GetTeamsTeamIdRepos_756265 = ref object of OpenApiRestCall_753573
 proc url_GetTeamsTeamIdRepos_756267(protocol: Scheme; host: string; base: string;
@@ -22399,8 +22328,7 @@ proc url_GetTeamsTeamIdRepos_756267(protocol: Scheme; host: string; base: string
 
 proc validate_GetTeamsTeamIdRepos_756266(path: JsonNode; query: JsonNode;
                                         header: JsonNode; formData: JsonNode;
-                                        body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                        body: JsonNode; _: string = ""): JsonNode =
   ## List team repos
   ## 
   var section: JsonNode
@@ -22441,9 +22369,9 @@ proc call*(call_756270: Call_GetTeamsTeamIdRepos_756265; path: JsonNode = nil;
   let scheme = call_756270.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756270.url(scheme.get, call_756270.host, call_756270.base,
-                         call_756270.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756270.makeUrl(scheme.get, call_756270.host, call_756270.base,
+                             call_756270.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756270, uri, valid, _)
 
 proc call*(call_756271: Call_GetTeamsTeamIdRepos_756265; teamId: int;
@@ -22463,7 +22391,7 @@ proc call*(call_756271: Call_GetTeamsTeamIdRepos_756265; teamId: int;
 var getTeamsTeamIdRepos* = Call_GetTeamsTeamIdRepos_756265(
     name: "getTeamsTeamIdRepos", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/teams/{teamId}/repos", validator: validate_GetTeamsTeamIdRepos_756266,
-    base: "/", url: url_GetTeamsTeamIdRepos_756267, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetTeamsTeamIdRepos_756267, schemes: {Scheme.Https})
 type
   Call_PutTeamsTeamIdReposOwnerRepo_756285 = ref object of OpenApiRestCall_753573
 proc url_PutTeamsTeamIdReposOwnerRepo_756287(protocol: Scheme; host: string;
@@ -22493,8 +22421,7 @@ proc url_PutTeamsTeamIdReposOwnerRepo_756287(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PutTeamsTeamIdReposOwnerRepo_756286(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## In order to add a repository to a team, the authenticated user must be an owner of the org that the team is associated with. Also, the repository must be owned by the organization, or a direct fork of a repository owned by the organization.
   ## 
   var section: JsonNode
@@ -22549,9 +22476,9 @@ proc call*(call_756292: Call_PutTeamsTeamIdReposOwnerRepo_756285;
   let scheme = call_756292.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756292.url(scheme.get, call_756292.host, call_756292.base,
-                         call_756292.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756292.makeUrl(scheme.get, call_756292.host, call_756292.base,
+                             call_756292.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756292, uri, valid, _)
 
 proc call*(call_756293: Call_PutTeamsTeamIdReposOwnerRepo_756285; repo: string;
@@ -22578,7 +22505,7 @@ var putTeamsTeamIdReposOwnerRepo* = Call_PutTeamsTeamIdReposOwnerRepo_756285(
     name: "putTeamsTeamIdReposOwnerRepo", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/teams/{teamId}/repos/{owner}/{repo}",
     validator: validate_PutTeamsTeamIdReposOwnerRepo_756286, base: "/",
-    url: url_PutTeamsTeamIdReposOwnerRepo_756287, schemes: {Scheme.Https})
+    makeUrl: url_PutTeamsTeamIdReposOwnerRepo_756287, schemes: {Scheme.Https})
 type
   Call_GetTeamsTeamIdReposOwnerRepo_756274 = ref object of OpenApiRestCall_753573
 proc url_GetTeamsTeamIdReposOwnerRepo_756276(protocol: Scheme; host: string;
@@ -22608,8 +22535,7 @@ proc url_GetTeamsTeamIdReposOwnerRepo_756276(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetTeamsTeamIdReposOwnerRepo_756275(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Check if a team manages a repository
   ## 
   var section: JsonNode
@@ -22664,9 +22590,9 @@ proc call*(call_756281: Call_GetTeamsTeamIdReposOwnerRepo_756274;
   let scheme = call_756281.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756281.url(scheme.get, call_756281.host, call_756281.base,
-                         call_756281.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756281.makeUrl(scheme.get, call_756281.host, call_756281.base,
+                             call_756281.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756281, uri, valid, _)
 
 proc call*(call_756282: Call_GetTeamsTeamIdReposOwnerRepo_756274; repo: string;
@@ -22693,7 +22619,7 @@ var getTeamsTeamIdReposOwnerRepo* = Call_GetTeamsTeamIdReposOwnerRepo_756274(
     name: "getTeamsTeamIdReposOwnerRepo", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/teams/{teamId}/repos/{owner}/{repo}",
     validator: validate_GetTeamsTeamIdReposOwnerRepo_756275, base: "/",
-    url: url_GetTeamsTeamIdReposOwnerRepo_756276, schemes: {Scheme.Https})
+    makeUrl: url_GetTeamsTeamIdReposOwnerRepo_756276, schemes: {Scheme.Https})
 type
   Call_DeleteTeamsTeamIdReposOwnerRepo_756296 = ref object of OpenApiRestCall_753573
 proc url_DeleteTeamsTeamIdReposOwnerRepo_756298(protocol: Scheme; host: string;
@@ -22724,7 +22650,7 @@ proc url_DeleteTeamsTeamIdReposOwnerRepo_756298(protocol: Scheme; host: string;
 
 proc validate_DeleteTeamsTeamIdReposOwnerRepo_756297(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## In order to remove a repository from a team, the authenticated user must be an owner of the org that the team is associated with. NOTE: This does not delete the repository, it just removes it from the team.
   ## 
   var section: JsonNode
@@ -22779,9 +22705,9 @@ proc call*(call_756303: Call_DeleteTeamsTeamIdReposOwnerRepo_756296;
   let scheme = call_756303.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756303.url(scheme.get, call_756303.host, call_756303.base,
-                         call_756303.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756303.makeUrl(scheme.get, call_756303.host, call_756303.base,
+                             call_756303.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756303, uri, valid, _)
 
 proc call*(call_756304: Call_DeleteTeamsTeamIdReposOwnerRepo_756296; repo: string;
@@ -22808,7 +22734,7 @@ var deleteTeamsTeamIdReposOwnerRepo* = Call_DeleteTeamsTeamIdReposOwnerRepo_7562
     name: "deleteTeamsTeamIdReposOwnerRepo", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/teams/{teamId}/repos/{owner}/{repo}",
     validator: validate_DeleteTeamsTeamIdReposOwnerRepo_756297, base: "/",
-    url: url_DeleteTeamsTeamIdReposOwnerRepo_756298, schemes: {Scheme.Https})
+    makeUrl: url_DeleteTeamsTeamIdReposOwnerRepo_756298, schemes: {Scheme.Https})
 type
   Call_GetUser_756307 = ref object of OpenApiRestCall_753573
 proc url_GetUser_756309(protocol: Scheme; host: string; base: string; route: string;
@@ -22823,8 +22749,7 @@ proc url_GetUser_756309(protocol: Scheme; host: string; base: string; route: str
     result.path = base & route
 
 proc validate_GetUser_756308(path: JsonNode; query: JsonNode; header: JsonNode;
-                            formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                            formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get the authenticated user.
   ## 
   var section: JsonNode
@@ -22857,9 +22782,9 @@ proc call*(call_756311: Call_GetUser_756307; path: JsonNode = nil;
   let scheme = call_756311.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756311.url(scheme.get, call_756311.host, call_756311.base,
-                         call_756311.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756311.makeUrl(scheme.get, call_756311.host, call_756311.base,
+                             call_756311.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756311, uri, valid, _)
 
 proc call*(call_756312: Call_GetUser_756307; Accept: string = ""): Recallable =
@@ -22874,7 +22799,8 @@ proc call*(call_756312: Call_GetUser_756307; Accept: string = ""): Recallable =
 var getUser* = Call_GetUser_756307(name: "getUser", meth: HttpMethod.HttpGet,
                                 host: "api.github.com", route: "/user",
                                 validator: validate_GetUser_756308, base: "/",
-                                url: url_GetUser_756309, schemes: {Scheme.Https})
+                                makeUrl: url_GetUser_756309,
+                                schemes: {Scheme.Https})
 type
   Call_PatchUser_756314 = ref object of OpenApiRestCall_753573
 proc url_PatchUser_756316(protocol: Scheme; host: string; base: string; route: string;
@@ -22889,8 +22815,7 @@ proc url_PatchUser_756316(protocol: Scheme; host: string; base: string; route: s
     result.path = base & route
 
 proc validate_PatchUser_756315(path: JsonNode; query: JsonNode; header: JsonNode;
-                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                              formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Update the authenticated user.
   ## 
   var section: JsonNode
@@ -22927,9 +22852,9 @@ proc call*(call_756319: Call_PatchUser_756314; path: JsonNode = nil;
   let scheme = call_756319.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756319.url(scheme.get, call_756319.host, call_756319.base,
-                         call_756319.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756319.makeUrl(scheme.get, call_756319.host, call_756319.base,
+                             call_756319.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756319, uri, valid, _)
 
 proc call*(call_756320: Call_PatchUser_756314; body: JsonNode; Accept: string = ""): Recallable =
@@ -22948,7 +22873,7 @@ proc call*(call_756320: Call_PatchUser_756314; body: JsonNode; Accept: string = 
 var patchUser* = Call_PatchUser_756314(name: "patchUser", meth: HttpMethod.HttpPatch,
                                     host: "api.github.com", route: "/user",
                                     validator: validate_PatchUser_756315,
-                                    base: "/", url: url_PatchUser_756316,
+                                    base: "/", makeUrl: url_PatchUser_756316,
                                     schemes: {Scheme.Https})
 type
   Call_PostUserEmails_756330 = ref object of OpenApiRestCall_753573
@@ -22965,7 +22890,7 @@ proc url_PostUserEmails_756332(protocol: Scheme; host: string; base: string;
 
 proc validate_PostUserEmails_756331(path: JsonNode; query: JsonNode;
                                    header: JsonNode; formData: JsonNode;
-                                   body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                   body: JsonNode; _: string = ""): JsonNode =
   ## Add email address(es).
   ## You can post a single email address or an array of addresses.
   ## 
@@ -23006,9 +22931,9 @@ proc call*(call_756335: Call_PostUserEmails_756330; path: JsonNode = nil;
   let scheme = call_756335.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756335.url(scheme.get, call_756335.host, call_756335.base,
-                         call_756335.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756335.makeUrl(scheme.get, call_756335.host, call_756335.base,
+                             call_756335.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756335, uri, valid, _)
 
 proc call*(call_756336: Call_PostUserEmails_756330; body: JsonNode;
@@ -23029,8 +22954,8 @@ proc call*(call_756336: Call_PostUserEmails_756330; body: JsonNode;
 
 var postUserEmails* = Call_PostUserEmails_756330(name: "postUserEmails",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/user/emails",
-    validator: validate_PostUserEmails_756331, base: "/", url: url_PostUserEmails_756332,
-    schemes: {Scheme.Https})
+    validator: validate_PostUserEmails_756331, base: "/",
+    makeUrl: url_PostUserEmails_756332, schemes: {Scheme.Https})
 type
   Call_GetUserEmails_756323 = ref object of OpenApiRestCall_753573
 proc url_GetUserEmails_756325(protocol: Scheme; host: string; base: string;
@@ -23045,8 +22970,7 @@ proc url_GetUserEmails_756325(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetUserEmails_756324(path: JsonNode; query: JsonNode; header: JsonNode;
-                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List email addresses for a user.
   ## In the final version of the API, this method will return an array of hashes
   ## with extended information for each email address indicating if the address
@@ -23091,9 +23015,9 @@ proc call*(call_756327: Call_GetUserEmails_756323; path: JsonNode = nil;
   let scheme = call_756327.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756327.url(scheme.get, call_756327.host, call_756327.base,
-                         call_756327.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756327.makeUrl(scheme.get, call_756327.host, call_756327.base,
+                             call_756327.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756327, uri, valid, _)
 
 proc call*(call_756328: Call_GetUserEmails_756323; Accept: string = ""): Recallable =
@@ -23113,7 +23037,7 @@ proc call*(call_756328: Call_GetUserEmails_756323; Accept: string = ""): Recalla
 
 var getUserEmails* = Call_GetUserEmails_756323(name: "getUserEmails",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/emails",
-    validator: validate_GetUserEmails_756324, base: "/", url: url_GetUserEmails_756325,
+    validator: validate_GetUserEmails_756324, base: "/", makeUrl: url_GetUserEmails_756325,
     schemes: {Scheme.Https})
 type
   Call_DeleteUserEmails_756339 = ref object of OpenApiRestCall_753573
@@ -23130,8 +23054,7 @@ proc url_DeleteUserEmails_756341(protocol: Scheme; host: string; base: string;
 
 proc validate_DeleteUserEmails_756340(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Delete email address(es).
   ## You can include a single email address or an array of addresses.
   ## 
@@ -23172,9 +23095,9 @@ proc call*(call_756344: Call_DeleteUserEmails_756339; path: JsonNode = nil;
   let scheme = call_756344.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756344.url(scheme.get, call_756344.host, call_756344.base,
-                         call_756344.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756344.makeUrl(scheme.get, call_756344.host, call_756344.base,
+                             call_756344.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756344, uri, valid, _)
 
 proc call*(call_756345: Call_DeleteUserEmails_756339; body: JsonNode;
@@ -23196,7 +23119,7 @@ proc call*(call_756345: Call_DeleteUserEmails_756339; body: JsonNode;
 var deleteUserEmails* = Call_DeleteUserEmails_756339(name: "deleteUserEmails",
     meth: HttpMethod.HttpDelete, host: "api.github.com", route: "/user/emails",
     validator: validate_DeleteUserEmails_756340, base: "/",
-    url: url_DeleteUserEmails_756341, schemes: {Scheme.Https})
+    makeUrl: url_DeleteUserEmails_756341, schemes: {Scheme.Https})
 type
   Call_GetUserFollowers_756348 = ref object of OpenApiRestCall_753573
 proc url_GetUserFollowers_756350(protocol: Scheme; host: string; base: string;
@@ -23212,8 +23135,7 @@ proc url_GetUserFollowers_756350(protocol: Scheme; host: string; base: string;
 
 proc validate_GetUserFollowers_756349(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## List the authenticated user's followers
   ## 
   var section: JsonNode
@@ -23246,9 +23168,9 @@ proc call*(call_756352: Call_GetUserFollowers_756348; path: JsonNode = nil;
   let scheme = call_756352.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756352.url(scheme.get, call_756352.host, call_756352.base,
-                         call_756352.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756352.makeUrl(scheme.get, call_756352.host, call_756352.base,
+                             call_756352.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756352, uri, valid, _)
 
 proc call*(call_756353: Call_GetUserFollowers_756348; Accept: string = ""): Recallable =
@@ -23263,7 +23185,7 @@ proc call*(call_756353: Call_GetUserFollowers_756348; Accept: string = ""): Reca
 var getUserFollowers* = Call_GetUserFollowers_756348(name: "getUserFollowers",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/followers",
     validator: validate_GetUserFollowers_756349, base: "/",
-    url: url_GetUserFollowers_756350, schemes: {Scheme.Https})
+    makeUrl: url_GetUserFollowers_756350, schemes: {Scheme.Https})
 type
   Call_GetUserFollowing_756355 = ref object of OpenApiRestCall_753573
 proc url_GetUserFollowing_756357(protocol: Scheme; host: string; base: string;
@@ -23279,8 +23201,7 @@ proc url_GetUserFollowing_756357(protocol: Scheme; host: string; base: string;
 
 proc validate_GetUserFollowing_756356(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## List who the authenticated user is following.
   ## 
   var section: JsonNode
@@ -23313,9 +23234,9 @@ proc call*(call_756359: Call_GetUserFollowing_756355; path: JsonNode = nil;
   let scheme = call_756359.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756359.url(scheme.get, call_756359.host, call_756359.base,
-                         call_756359.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756359.makeUrl(scheme.get, call_756359.host, call_756359.base,
+                             call_756359.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756359, uri, valid, _)
 
 proc call*(call_756360: Call_GetUserFollowing_756355; Accept: string = ""): Recallable =
@@ -23330,7 +23251,7 @@ proc call*(call_756360: Call_GetUserFollowing_756355; Accept: string = ""): Reca
 var getUserFollowing* = Call_GetUserFollowing_756355(name: "getUserFollowing",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/following",
     validator: validate_GetUserFollowing_756356, base: "/",
-    url: url_GetUserFollowing_756357, schemes: {Scheme.Https})
+    makeUrl: url_GetUserFollowing_756357, schemes: {Scheme.Https})
 type
   Call_PutUserFollowingUsername_756371 = ref object of OpenApiRestCall_753573
 proc url_PutUserFollowingUsername_756373(protocol: Scheme; host: string;
@@ -23355,8 +23276,7 @@ proc url_PutUserFollowingUsername_756373(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PutUserFollowingUsername_756372(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Follow a user.
   ## Following a user requires the user to be logged in and authenticated with
   ## basic auth or OAuth with the user:follow scope.
@@ -23404,9 +23324,9 @@ proc call*(call_756376: Call_PutUserFollowingUsername_756371; path: JsonNode = n
   let scheme = call_756376.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756376.url(scheme.get, call_756376.host, call_756376.base,
-                         call_756376.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756376.makeUrl(scheme.get, call_756376.host, call_756376.base,
+                             call_756376.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756376, uri, valid, _)
 
 proc call*(call_756377: Call_PutUserFollowingUsername_756371; username: string;
@@ -23430,7 +23350,7 @@ var putUserFollowingUsername* = Call_PutUserFollowingUsername_756371(
     name: "putUserFollowingUsername", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/user/following/{username}",
     validator: validate_PutUserFollowingUsername_756372, base: "/",
-    url: url_PutUserFollowingUsername_756373, schemes: {Scheme.Https})
+    makeUrl: url_PutUserFollowingUsername_756373, schemes: {Scheme.Https})
 type
   Call_GetUserFollowingUsername_756362 = ref object of OpenApiRestCall_753573
 proc url_GetUserFollowingUsername_756364(protocol: Scheme; host: string;
@@ -23455,8 +23375,7 @@ proc url_GetUserFollowingUsername_756364(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetUserFollowingUsername_756363(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Check if you are following a user.
   ## 
   var section: JsonNode
@@ -23498,9 +23417,9 @@ proc call*(call_756367: Call_GetUserFollowingUsername_756362; path: JsonNode = n
   let scheme = call_756367.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756367.url(scheme.get, call_756367.host, call_756367.base,
-                         call_756367.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756367.makeUrl(scheme.get, call_756367.host, call_756367.base,
+                             call_756367.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756367, uri, valid, _)
 
 proc call*(call_756368: Call_GetUserFollowingUsername_756362; username: string;
@@ -23521,7 +23440,7 @@ var getUserFollowingUsername* = Call_GetUserFollowingUsername_756362(
     name: "getUserFollowingUsername", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/user/following/{username}",
     validator: validate_GetUserFollowingUsername_756363, base: "/",
-    url: url_GetUserFollowingUsername_756364, schemes: {Scheme.Https})
+    makeUrl: url_GetUserFollowingUsername_756364, schemes: {Scheme.Https})
 type
   Call_DeleteUserFollowingUsername_756380 = ref object of OpenApiRestCall_753573
 proc url_DeleteUserFollowingUsername_756382(protocol: Scheme; host: string;
@@ -23545,8 +23464,7 @@ proc url_DeleteUserFollowingUsername_756382(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_DeleteUserFollowingUsername_756381(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Unfollow a user.
   ## Unfollowing a user requires the user to be logged in and authenticated with
   ## basic auth or OAuth with the user:follow scope.
@@ -23594,9 +23512,9 @@ proc call*(call_756385: Call_DeleteUserFollowingUsername_756380;
   let scheme = call_756385.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756385.url(scheme.get, call_756385.host, call_756385.base,
-                         call_756385.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756385.makeUrl(scheme.get, call_756385.host, call_756385.base,
+                             call_756385.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756385, uri, valid, _)
 
 proc call*(call_756386: Call_DeleteUserFollowingUsername_756380; username: string;
@@ -23620,7 +23538,7 @@ var deleteUserFollowingUsername* = Call_DeleteUserFollowingUsername_756380(
     name: "deleteUserFollowingUsername", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/user/following/{username}",
     validator: validate_DeleteUserFollowingUsername_756381, base: "/",
-    url: url_DeleteUserFollowingUsername_756382, schemes: {Scheme.Https})
+    makeUrl: url_DeleteUserFollowingUsername_756382, schemes: {Scheme.Https})
 type
   Call_GetUserIssues_756389 = ref object of OpenApiRestCall_753573
 proc url_GetUserIssues_756391(protocol: Scheme; host: string; base: string;
@@ -23635,8 +23553,7 @@ proc url_GetUserIssues_756391(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetUserIssues_756390(path: JsonNode; query: JsonNode; header: JsonNode;
-                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List issues.
   ## List all issues across owned and member repositories for the authenticated
   ## user.
@@ -23719,9 +23636,9 @@ proc call*(call_756399: Call_GetUserIssues_756389; path: JsonNode = nil;
   let scheme = call_756399.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756399.url(scheme.get, call_756399.host, call_756399.base,
-                         call_756399.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756399.makeUrl(scheme.get, call_756399.host, call_756399.base,
+                             call_756399.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756399, uri, valid, _)
 
 proc call*(call_756400: Call_GetUserIssues_756389; labels: string;
@@ -23760,7 +23677,7 @@ proc call*(call_756400: Call_GetUserIssues_756389; labels: string;
 
 var getUserIssues* = Call_GetUserIssues_756389(name: "getUserIssues",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/issues",
-    validator: validate_GetUserIssues_756390, base: "/", url: url_GetUserIssues_756391,
+    validator: validate_GetUserIssues_756390, base: "/", makeUrl: url_GetUserIssues_756391,
     schemes: {Scheme.Https})
 type
   Call_PostUserKeys_756410 = ref object of OpenApiRestCall_753573
@@ -23776,8 +23693,7 @@ proc url_PostUserKeys_756412(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_PostUserKeys_756411(path: JsonNode; query: JsonNode; header: JsonNode;
-                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a public key.
   ## 
   var section: JsonNode
@@ -23814,9 +23730,9 @@ proc call*(call_756415: Call_PostUserKeys_756410; path: JsonNode = nil;
   let scheme = call_756415.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756415.url(scheme.get, call_756415.host, call_756415.base,
-                         call_756415.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756415.makeUrl(scheme.get, call_756415.host, call_756415.base,
+                             call_756415.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756415, uri, valid, _)
 
 proc call*(call_756416: Call_PostUserKeys_756410; body: JsonNode; Accept: string = ""): Recallable =
@@ -23834,7 +23750,7 @@ proc call*(call_756416: Call_PostUserKeys_756410; body: JsonNode; Accept: string
 
 var postUserKeys* = Call_PostUserKeys_756410(name: "postUserKeys",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/user/keys",
-    validator: validate_PostUserKeys_756411, base: "/", url: url_PostUserKeys_756412,
+    validator: validate_PostUserKeys_756411, base: "/", makeUrl: url_PostUserKeys_756412,
     schemes: {Scheme.Https})
 type
   Call_GetUserKeys_756403 = ref object of OpenApiRestCall_753573
@@ -23850,8 +23766,7 @@ proc url_GetUserKeys_756405(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetUserKeys_756404(path: JsonNode; query: JsonNode; header: JsonNode;
-                                formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List your public keys.
   ## Lists the current user's keys. Management of public keys via the API requires
   ## that you are authenticated through basic auth, or OAuth with the 'user', 'write:public_key' scopes.
@@ -23890,9 +23805,9 @@ proc call*(call_756407: Call_GetUserKeys_756403; path: JsonNode = nil;
   let scheme = call_756407.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756407.url(scheme.get, call_756407.host, call_756407.base,
-                         call_756407.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756407.makeUrl(scheme.get, call_756407.host, call_756407.base,
+                             call_756407.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756407, uri, valid, _)
 
 proc call*(call_756408: Call_GetUserKeys_756403; Accept: string = ""): Recallable =
@@ -23912,7 +23827,7 @@ var getUserKeys* = Call_GetUserKeys_756403(name: "getUserKeys",
                                         host: "api.github.com",
                                         route: "/user/keys",
                                         validator: validate_GetUserKeys_756404,
-                                        base: "/", url: url_GetUserKeys_756405,
+                                        base: "/", makeUrl: url_GetUserKeys_756405,
                                         schemes: {Scheme.Https})
 type
   Call_GetUserKeysKeyId_756419 = ref object of OpenApiRestCall_753573
@@ -23938,8 +23853,7 @@ proc url_GetUserKeysKeyId_756421(protocol: Scheme; host: string; base: string;
 
 proc validate_GetUserKeysKeyId_756420(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Get a single public key.
   ## 
   var section: JsonNode
@@ -23980,9 +23894,9 @@ proc call*(call_756424: Call_GetUserKeysKeyId_756419; path: JsonNode = nil;
   let scheme = call_756424.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756424.url(scheme.get, call_756424.host, call_756424.base,
-                         call_756424.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756424.makeUrl(scheme.get, call_756424.host, call_756424.base,
+                             call_756424.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756424, uri, valid, _)
 
 proc call*(call_756425: Call_GetUserKeysKeyId_756419; keyId: int; Accept: string = ""): Recallable =
@@ -24001,7 +23915,7 @@ proc call*(call_756425: Call_GetUserKeysKeyId_756419; keyId: int; Accept: string
 var getUserKeysKeyId* = Call_GetUserKeysKeyId_756419(name: "getUserKeysKeyId",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/keys/{keyId}",
     validator: validate_GetUserKeysKeyId_756420, base: "/",
-    url: url_GetUserKeysKeyId_756421, schemes: {Scheme.Https})
+    makeUrl: url_GetUserKeysKeyId_756421, schemes: {Scheme.Https})
 type
   Call_DeleteUserKeysKeyId_756428 = ref object of OpenApiRestCall_753573
 proc url_DeleteUserKeysKeyId_756430(protocol: Scheme; host: string; base: string;
@@ -24026,8 +23940,7 @@ proc url_DeleteUserKeysKeyId_756430(protocol: Scheme; host: string; base: string
 
 proc validate_DeleteUserKeysKeyId_756429(path: JsonNode; query: JsonNode;
                                         header: JsonNode; formData: JsonNode;
-                                        body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                        body: JsonNode; _: string = ""): JsonNode =
   ## Delete a public key. Removes a public key. Requires that you are authenticated via Basic Auth or via OAuth with at least admin:public_key scope.
   ## 
   var section: JsonNode
@@ -24068,9 +23981,9 @@ proc call*(call_756433: Call_DeleteUserKeysKeyId_756428; path: JsonNode = nil;
   let scheme = call_756433.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756433.url(scheme.get, call_756433.host, call_756433.base,
-                         call_756433.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756433.makeUrl(scheme.get, call_756433.host, call_756433.base,
+                             call_756433.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756433, uri, valid, _)
 
 proc call*(call_756434: Call_DeleteUserKeysKeyId_756428; keyId: int;
@@ -24091,7 +24004,7 @@ var deleteUserKeysKeyId* = Call_DeleteUserKeysKeyId_756428(
     name: "deleteUserKeysKeyId", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/user/keys/{keyId}",
     validator: validate_DeleteUserKeysKeyId_756429, base: "/",
-    url: url_DeleteUserKeysKeyId_756430, schemes: {Scheme.Https})
+    makeUrl: url_DeleteUserKeysKeyId_756430, schemes: {Scheme.Https})
 type
   Call_GetUserOrgs_756437 = ref object of OpenApiRestCall_753573
 proc url_GetUserOrgs_756439(protocol: Scheme; host: string; base: string;
@@ -24106,8 +24019,7 @@ proc url_GetUserOrgs_756439(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetUserOrgs_756438(path: JsonNode; query: JsonNode; header: JsonNode;
-                                formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List public and private organizations for the authenticated user.
   ## 
   var section: JsonNode
@@ -24140,9 +24052,9 @@ proc call*(call_756441: Call_GetUserOrgs_756437; path: JsonNode = nil;
   let scheme = call_756441.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756441.url(scheme.get, call_756441.host, call_756441.base,
-                         call_756441.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756441.makeUrl(scheme.get, call_756441.host, call_756441.base,
+                             call_756441.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756441, uri, valid, _)
 
 proc call*(call_756442: Call_GetUserOrgs_756437; Accept: string = ""): Recallable =
@@ -24159,7 +24071,7 @@ var getUserOrgs* = Call_GetUserOrgs_756437(name: "getUserOrgs",
                                         host: "api.github.com",
                                         route: "/user/orgs",
                                         validator: validate_GetUserOrgs_756438,
-                                        base: "/", url: url_GetUserOrgs_756439,
+                                        base: "/", makeUrl: url_GetUserOrgs_756439,
                                         schemes: {Scheme.Https})
 type
   Call_PostUserRepos_756453 = ref object of OpenApiRestCall_753573
@@ -24175,8 +24087,7 @@ proc url_PostUserRepos_756455(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_PostUserRepos_756454(path: JsonNode; query: JsonNode; header: JsonNode;
-                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                  formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Create a new repository for the authenticated user. OAuth users must supply
   ## repo scope.
   ## 
@@ -24217,9 +24128,9 @@ proc call*(call_756458: Call_PostUserRepos_756453; path: JsonNode = nil;
   let scheme = call_756458.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756458.url(scheme.get, call_756458.host, call_756458.base,
-                         call_756458.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756458.makeUrl(scheme.get, call_756458.host, call_756458.base,
+                             call_756458.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756458, uri, valid, _)
 
 proc call*(call_756459: Call_PostUserRepos_756453; body: JsonNode;
@@ -24240,7 +24151,7 @@ proc call*(call_756459: Call_PostUserRepos_756453; body: JsonNode;
 
 var postUserRepos* = Call_PostUserRepos_756453(name: "postUserRepos",
     meth: HttpMethod.HttpPost, host: "api.github.com", route: "/user/repos",
-    validator: validate_PostUserRepos_756454, base: "/", url: url_PostUserRepos_756455,
+    validator: validate_PostUserRepos_756454, base: "/", makeUrl: url_PostUserRepos_756455,
     schemes: {Scheme.Https})
 type
   Call_GetUserRepos_756444 = ref object of OpenApiRestCall_753573
@@ -24256,8 +24167,7 @@ proc url_GetUserRepos_756446(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetUserRepos_756445(path: JsonNode; query: JsonNode; header: JsonNode;
-                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List repositories for the authenticated user. Note that this does not include
   ## repositories owned by organizations which the user can access. You can lis
   ## user organizations and list organization repositories separately.
@@ -24303,9 +24213,9 @@ proc call*(call_756449: Call_GetUserRepos_756444; path: JsonNode = nil;
   let scheme = call_756449.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756449.url(scheme.get, call_756449.host, call_756449.base,
-                         call_756449.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756449.makeUrl(scheme.get, call_756449.host, call_756449.base,
+                             call_756449.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756449, uri, valid, _)
 
 proc call*(call_756450: Call_GetUserRepos_756444; `type`: string = "all";
@@ -24326,7 +24236,7 @@ proc call*(call_756450: Call_GetUserRepos_756444; `type`: string = "all";
 
 var getUserRepos* = Call_GetUserRepos_756444(name: "getUserRepos",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/repos",
-    validator: validate_GetUserRepos_756445, base: "/", url: url_GetUserRepos_756446,
+    validator: validate_GetUserRepos_756445, base: "/", makeUrl: url_GetUserRepos_756446,
     schemes: {Scheme.Https})
 type
   Call_GetUserStarred_756462 = ref object of OpenApiRestCall_753573
@@ -24343,7 +24253,7 @@ proc url_GetUserStarred_756464(protocol: Scheme; host: string; base: string;
 
 proc validate_GetUserStarred_756463(path: JsonNode; query: JsonNode;
                                    header: JsonNode; formData: JsonNode;
-                                   body: JsonNode; _: string = ""): JsonNode {.nosinks.} =
+                                   body: JsonNode; _: string = ""): JsonNode =
   ## List repositories being starred by the authenticated user.
   ## 
   var section: JsonNode
@@ -24390,9 +24300,9 @@ proc call*(call_756468: Call_GetUserStarred_756462; path: JsonNode = nil;
   let scheme = call_756468.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756468.url(scheme.get, call_756468.host, call_756468.base,
-                         call_756468.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756468.makeUrl(scheme.get, call_756468.host, call_756468.base,
+                             call_756468.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756468, uri, valid, _)
 
 proc call*(call_756469: Call_GetUserStarred_756462; sort: string = "created";
@@ -24413,8 +24323,8 @@ proc call*(call_756469: Call_GetUserStarred_756462; sort: string = "created";
 
 var getUserStarred* = Call_GetUserStarred_756462(name: "getUserStarred",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/starred",
-    validator: validate_GetUserStarred_756463, base: "/", url: url_GetUserStarred_756464,
-    schemes: {Scheme.Https})
+    validator: validate_GetUserStarred_756463, base: "/",
+    makeUrl: url_GetUserStarred_756464, schemes: {Scheme.Https})
 type
   Call_PutUserStarredOwnerRepo_756482 = ref object of OpenApiRestCall_753573
 proc url_PutUserStarredOwnerRepo_756484(protocol: Scheme; host: string; base: string;
@@ -24442,8 +24352,7 @@ proc url_PutUserStarredOwnerRepo_756484(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_PutUserStarredOwnerRepo_756483(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Star a repository.
   ## 
   var section: JsonNode
@@ -24492,9 +24401,9 @@ proc call*(call_756488: Call_PutUserStarredOwnerRepo_756482; path: JsonNode = ni
   let scheme = call_756488.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756488.url(scheme.get, call_756488.host, call_756488.base,
-                         call_756488.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756488.makeUrl(scheme.get, call_756488.host, call_756488.base,
+                             call_756488.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756488, uri, valid, _)
 
 proc call*(call_756489: Call_PutUserStarredOwnerRepo_756482; repo: string;
@@ -24518,7 +24427,7 @@ var putUserStarredOwnerRepo* = Call_PutUserStarredOwnerRepo_756482(
     name: "putUserStarredOwnerRepo", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/user/starred/{owner}/{repo}",
     validator: validate_PutUserStarredOwnerRepo_756483, base: "/",
-    url: url_PutUserStarredOwnerRepo_756484, schemes: {Scheme.Https})
+    makeUrl: url_PutUserStarredOwnerRepo_756484, schemes: {Scheme.Https})
 type
   Call_GetUserStarredOwnerRepo_756472 = ref object of OpenApiRestCall_753573
 proc url_GetUserStarredOwnerRepo_756474(protocol: Scheme; host: string; base: string;
@@ -24546,8 +24455,7 @@ proc url_GetUserStarredOwnerRepo_756474(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetUserStarredOwnerRepo_756473(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Check if you are starring a repository.
   ## 
   var section: JsonNode
@@ -24596,9 +24504,9 @@ proc call*(call_756478: Call_GetUserStarredOwnerRepo_756472; path: JsonNode = ni
   let scheme = call_756478.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756478.url(scheme.get, call_756478.host, call_756478.base,
-                         call_756478.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756478.makeUrl(scheme.get, call_756478.host, call_756478.base,
+                             call_756478.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756478, uri, valid, _)
 
 proc call*(call_756479: Call_GetUserStarredOwnerRepo_756472; repo: string;
@@ -24622,7 +24530,7 @@ var getUserStarredOwnerRepo* = Call_GetUserStarredOwnerRepo_756472(
     name: "getUserStarredOwnerRepo", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/user/starred/{owner}/{repo}",
     validator: validate_GetUserStarredOwnerRepo_756473, base: "/",
-    url: url_GetUserStarredOwnerRepo_756474, schemes: {Scheme.Https})
+    makeUrl: url_GetUserStarredOwnerRepo_756474, schemes: {Scheme.Https})
 type
   Call_DeleteUserStarredOwnerRepo_756492 = ref object of OpenApiRestCall_753573
 proc url_DeleteUserStarredOwnerRepo_756494(protocol: Scheme; host: string;
@@ -24649,8 +24557,7 @@ proc url_DeleteUserStarredOwnerRepo_756494(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_DeleteUserStarredOwnerRepo_756493(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Unstar a repository
   ## 
   var section: JsonNode
@@ -24699,9 +24606,9 @@ proc call*(call_756498: Call_DeleteUserStarredOwnerRepo_756492;
   let scheme = call_756498.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756498.url(scheme.get, call_756498.host, call_756498.base,
-                         call_756498.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756498.makeUrl(scheme.get, call_756498.host, call_756498.base,
+                             call_756498.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756498, uri, valid, _)
 
 proc call*(call_756499: Call_DeleteUserStarredOwnerRepo_756492; repo: string;
@@ -24725,7 +24632,7 @@ var deleteUserStarredOwnerRepo* = Call_DeleteUserStarredOwnerRepo_756492(
     name: "deleteUserStarredOwnerRepo", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/user/starred/{owner}/{repo}",
     validator: validate_DeleteUserStarredOwnerRepo_756493, base: "/",
-    url: url_DeleteUserStarredOwnerRepo_756494, schemes: {Scheme.Https})
+    makeUrl: url_DeleteUserStarredOwnerRepo_756494, schemes: {Scheme.Https})
 type
   Call_GetUserSubscriptions_756502 = ref object of OpenApiRestCall_753573
 proc url_GetUserSubscriptions_756504(protocol: Scheme; host: string; base: string;
@@ -24740,8 +24647,7 @@ proc url_GetUserSubscriptions_756504(protocol: Scheme; host: string; base: strin
     result.path = base & route
 
 proc validate_GetUserSubscriptions_756503(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List repositories being watched by the authenticated user.
   ## 
   var section: JsonNode
@@ -24774,9 +24680,9 @@ proc call*(call_756506: Call_GetUserSubscriptions_756502; path: JsonNode = nil;
   let scheme = call_756506.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756506.url(scheme.get, call_756506.host, call_756506.base,
-                         call_756506.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756506.makeUrl(scheme.get, call_756506.host, call_756506.base,
+                             call_756506.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756506, uri, valid, _)
 
 proc call*(call_756507: Call_GetUserSubscriptions_756502; Accept: string = ""): Recallable =
@@ -24791,7 +24697,7 @@ proc call*(call_756507: Call_GetUserSubscriptions_756502; Accept: string = ""): 
 var getUserSubscriptions* = Call_GetUserSubscriptions_756502(
     name: "getUserSubscriptions", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/user/subscriptions", validator: validate_GetUserSubscriptions_756503,
-    base: "/", url: url_GetUserSubscriptions_756504, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetUserSubscriptions_756504, schemes: {Scheme.Https})
 type
   Call_PutUserSubscriptionsOwnerRepo_756519 = ref object of OpenApiRestCall_753573
 proc url_PutUserSubscriptionsOwnerRepo_756521(protocol: Scheme; host: string;
@@ -24818,8 +24724,7 @@ proc url_PutUserSubscriptionsOwnerRepo_756521(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_PutUserSubscriptionsOwnerRepo_756520(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Watch a repository.
   ## 
   var section: JsonNode
@@ -24868,9 +24773,9 @@ proc call*(call_756525: Call_PutUserSubscriptionsOwnerRepo_756519;
   let scheme = call_756525.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756525.url(scheme.get, call_756525.host, call_756525.base,
-                         call_756525.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756525.makeUrl(scheme.get, call_756525.host, call_756525.base,
+                             call_756525.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756525, uri, valid, _)
 
 proc call*(call_756526: Call_PutUserSubscriptionsOwnerRepo_756519; repo: string;
@@ -24894,7 +24799,7 @@ var putUserSubscriptionsOwnerRepo* = Call_PutUserSubscriptionsOwnerRepo_756519(
     name: "putUserSubscriptionsOwnerRepo", meth: HttpMethod.HttpPut,
     host: "api.github.com", route: "/user/subscriptions/{owner}/{repo}",
     validator: validate_PutUserSubscriptionsOwnerRepo_756520, base: "/",
-    url: url_PutUserSubscriptionsOwnerRepo_756521, schemes: {Scheme.Https})
+    makeUrl: url_PutUserSubscriptionsOwnerRepo_756521, schemes: {Scheme.Https})
 type
   Call_GetUserSubscriptionsOwnerRepo_756509 = ref object of OpenApiRestCall_753573
 proc url_GetUserSubscriptionsOwnerRepo_756511(protocol: Scheme; host: string;
@@ -24921,8 +24826,7 @@ proc url_GetUserSubscriptionsOwnerRepo_756511(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetUserSubscriptionsOwnerRepo_756510(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Check if you are watching a repository.
   ## 
   var section: JsonNode
@@ -24971,9 +24875,9 @@ proc call*(call_756515: Call_GetUserSubscriptionsOwnerRepo_756509;
   let scheme = call_756515.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756515.url(scheme.get, call_756515.host, call_756515.base,
-                         call_756515.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756515.makeUrl(scheme.get, call_756515.host, call_756515.base,
+                             call_756515.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756515, uri, valid, _)
 
 proc call*(call_756516: Call_GetUserSubscriptionsOwnerRepo_756509; repo: string;
@@ -24997,7 +24901,7 @@ var getUserSubscriptionsOwnerRepo* = Call_GetUserSubscriptionsOwnerRepo_756509(
     name: "getUserSubscriptionsOwnerRepo", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/user/subscriptions/{owner}/{repo}",
     validator: validate_GetUserSubscriptionsOwnerRepo_756510, base: "/",
-    url: url_GetUserSubscriptionsOwnerRepo_756511, schemes: {Scheme.Https})
+    makeUrl: url_GetUserSubscriptionsOwnerRepo_756511, schemes: {Scheme.Https})
 type
   Call_DeleteUserSubscriptionsOwnerRepo_756529 = ref object of OpenApiRestCall_753573
 proc url_DeleteUserSubscriptionsOwnerRepo_756531(protocol: Scheme; host: string;
@@ -25025,7 +24929,7 @@ proc url_DeleteUserSubscriptionsOwnerRepo_756531(protocol: Scheme; host: string;
 
 proc validate_DeleteUserSubscriptionsOwnerRepo_756530(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Stop watching a repository
   ## 
   var section: JsonNode
@@ -25074,9 +24978,9 @@ proc call*(call_756535: Call_DeleteUserSubscriptionsOwnerRepo_756529;
   let scheme = call_756535.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756535.url(scheme.get, call_756535.host, call_756535.base,
-                         call_756535.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756535.makeUrl(scheme.get, call_756535.host, call_756535.base,
+                             call_756535.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756535, uri, valid, _)
 
 proc call*(call_756536: Call_DeleteUserSubscriptionsOwnerRepo_756529; repo: string;
@@ -25100,7 +25004,7 @@ var deleteUserSubscriptionsOwnerRepo* = Call_DeleteUserSubscriptionsOwnerRepo_75
     name: "deleteUserSubscriptionsOwnerRepo", meth: HttpMethod.HttpDelete,
     host: "api.github.com", route: "/user/subscriptions/{owner}/{repo}",
     validator: validate_DeleteUserSubscriptionsOwnerRepo_756530, base: "/",
-    url: url_DeleteUserSubscriptionsOwnerRepo_756531, schemes: {Scheme.Https})
+    makeUrl: url_DeleteUserSubscriptionsOwnerRepo_756531, schemes: {Scheme.Https})
 type
   Call_GetUserTeams_756539 = ref object of OpenApiRestCall_753573
 proc url_GetUserTeams_756541(protocol: Scheme; host: string; base: string;
@@ -25115,8 +25019,7 @@ proc url_GetUserTeams_756541(protocol: Scheme; host: string; base: string;
     result.path = base & route
 
 proc validate_GetUserTeams_756540(path: JsonNode; query: JsonNode; header: JsonNode;
-                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                 formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List all of the teams across all of the organizations to which the authenticated user belongs. This method requires user or repo scope when authenticating via OAuth.
   ## 
   var section: JsonNode
@@ -25149,9 +25052,9 @@ proc call*(call_756543: Call_GetUserTeams_756539; path: JsonNode = nil;
   let scheme = call_756543.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756543.url(scheme.get, call_756543.host, call_756543.base,
-                         call_756543.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756543.makeUrl(scheme.get, call_756543.host, call_756543.base,
+                             call_756543.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756543, uri, valid, _)
 
 proc call*(call_756544: Call_GetUserTeams_756539; Accept: string = ""): Recallable =
@@ -25165,7 +25068,7 @@ proc call*(call_756544: Call_GetUserTeams_756539; Accept: string = ""): Recallab
 
 var getUserTeams* = Call_GetUserTeams_756539(name: "getUserTeams",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/user/teams",
-    validator: validate_GetUserTeams_756540, base: "/", url: url_GetUserTeams_756541,
+    validator: validate_GetUserTeams_756540, base: "/", makeUrl: url_GetUserTeams_756541,
     schemes: {Scheme.Https})
 type
   Call_GetUsers_756546 = ref object of OpenApiRestCall_753573
@@ -25181,8 +25084,7 @@ proc url_GetUsers_756548(protocol: Scheme; host: string; base: string; route: st
     result.path = base & route
 
 proc validate_GetUsers_756547(path: JsonNode; query: JsonNode; header: JsonNode;
-                             formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                             formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## Get all users.
   ## This provides a dump of every user, in the order that they signed up for GitHub.
   ## Note: Pagination is powered exclusively by the since parameter. Use the Link
@@ -25230,9 +25132,9 @@ proc call*(call_756551: Call_GetUsers_756546; path: JsonNode = nil;
   let scheme = call_756551.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756551.url(scheme.get, call_756551.host, call_756551.base,
-                         call_756551.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756551.makeUrl(scheme.get, call_756551.host, call_756551.base,
+                             call_756551.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756551, uri, valid, _)
 
 proc call*(call_756552: Call_GetUsers_756546; since: int = 0; Accept: string = ""): Recallable =
@@ -25255,7 +25157,7 @@ proc call*(call_756552: Call_GetUsers_756546; since: int = 0; Accept: string = "
 var getUsers* = Call_GetUsers_756546(name: "getUsers", meth: HttpMethod.HttpGet,
                                   host: "api.github.com", route: "/users",
                                   validator: validate_GetUsers_756547, base: "/",
-                                  url: url_GetUsers_756548,
+                                  makeUrl: url_GetUsers_756548,
                                   schemes: {Scheme.Https})
 type
   Call_GetUsersUsername_756555 = ref object of OpenApiRestCall_753573
@@ -25281,8 +25183,7 @@ proc url_GetUsersUsername_756557(protocol: Scheme; host: string; base: string;
 
 proc validate_GetUsersUsername_756556(path: JsonNode; query: JsonNode;
                                      header: JsonNode; formData: JsonNode;
-                                     body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+                                     body: JsonNode; _: string = ""): JsonNode =
   ## Get a single user.
   ## 
   var section: JsonNode
@@ -25324,9 +25225,9 @@ proc call*(call_756560: Call_GetUsersUsername_756555; path: JsonNode = nil;
   let scheme = call_756560.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756560.url(scheme.get, call_756560.host, call_756560.base,
-                         call_756560.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756560.makeUrl(scheme.get, call_756560.host, call_756560.base,
+                             call_756560.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756560, uri, valid, _)
 
 proc call*(call_756561: Call_GetUsersUsername_756555; username: string;
@@ -25346,7 +25247,7 @@ proc call*(call_756561: Call_GetUsersUsername_756555; username: string;
 var getUsersUsername* = Call_GetUsersUsername_756555(name: "getUsersUsername",
     meth: HttpMethod.HttpGet, host: "api.github.com", route: "/users/{username}",
     validator: validate_GetUsersUsername_756556, base: "/",
-    url: url_GetUsersUsername_756557, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsername_756557, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameEvents_756564 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameEvents_756566(protocol: Scheme; host: string; base: string;
@@ -25371,8 +25272,7 @@ proc url_GetUsersUsernameEvents_756566(protocol: Scheme; host: string; base: str
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameEvents_756565(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## If you are authenticated as the given user, you will see your private events. Otherwise, you'll only see public events.
   ## 
   var section: JsonNode
@@ -25414,9 +25314,9 @@ proc call*(call_756569: Call_GetUsersUsernameEvents_756564; path: JsonNode = nil
   let scheme = call_756569.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756569.url(scheme.get, call_756569.host, call_756569.base,
-                         call_756569.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756569.makeUrl(scheme.get, call_756569.host, call_756569.base,
+                             call_756569.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756569, uri, valid, _)
 
 proc call*(call_756570: Call_GetUsersUsernameEvents_756564; username: string;
@@ -25437,7 +25337,7 @@ var getUsersUsernameEvents* = Call_GetUsersUsernameEvents_756564(
     name: "getUsersUsernameEvents", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/events",
     validator: validate_GetUsersUsernameEvents_756565, base: "/",
-    url: url_GetUsersUsernameEvents_756566, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameEvents_756566, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameEventsOrgsOrg_756573 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameEventsOrgsOrg_756575(protocol: Scheme; host: string;
@@ -25464,8 +25364,7 @@ proc url_GetUsersUsernameEventsOrgsOrg_756575(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameEventsOrgsOrg_756574(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## This is the user's organization dashboard. You must be authenticated as the user to view this.
   ## 
   var section: JsonNode
@@ -25513,9 +25412,9 @@ proc call*(call_756579: Call_GetUsersUsernameEventsOrgsOrg_756573;
   let scheme = call_756579.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756579.url(scheme.get, call_756579.host, call_756579.base,
-                         call_756579.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756579.makeUrl(scheme.get, call_756579.host, call_756579.base,
+                             call_756579.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756579, uri, valid, _)
 
 proc call*(call_756580: Call_GetUsersUsernameEventsOrgsOrg_756573;
@@ -25538,7 +25437,7 @@ var getUsersUsernameEventsOrgsOrg* = Call_GetUsersUsernameEventsOrgsOrg_756573(
     name: "getUsersUsernameEventsOrgsOrg", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/events/orgs/{org}",
     validator: validate_GetUsersUsernameEventsOrgsOrg_756574, base: "/",
-    url: url_GetUsersUsernameEventsOrgsOrg_756575, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameEventsOrgsOrg_756575, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameFollowers_756583 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameFollowers_756585(protocol: Scheme; host: string;
@@ -25563,8 +25462,7 @@ proc url_GetUsersUsernameFollowers_756585(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameFollowers_756584(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List a user's followers
   ## 
   var section: JsonNode
@@ -25606,9 +25504,9 @@ proc call*(call_756588: Call_GetUsersUsernameFollowers_756583;
   let scheme = call_756588.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756588.url(scheme.get, call_756588.host, call_756588.base,
-                         call_756588.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756588.makeUrl(scheme.get, call_756588.host, call_756588.base,
+                             call_756588.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756588, uri, valid, _)
 
 proc call*(call_756589: Call_GetUsersUsernameFollowers_756583; username: string;
@@ -25629,7 +25527,7 @@ var getUsersUsernameFollowers* = Call_GetUsersUsernameFollowers_756583(
     name: "getUsersUsernameFollowers", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/followers",
     validator: validate_GetUsersUsernameFollowers_756584, base: "/",
-    url: url_GetUsersUsernameFollowers_756585, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameFollowers_756585, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameFollowingTargetUser_756592 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameFollowingTargetUser_756594(protocol: Scheme; host: string;
@@ -25657,7 +25555,7 @@ proc url_GetUsersUsernameFollowingTargetUser_756594(protocol: Scheme; host: stri
 
 proc validate_GetUsersUsernameFollowingTargetUser_756593(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## Check if one user follows another.
   ## 
   var section: JsonNode
@@ -25706,9 +25604,9 @@ proc call*(call_756598: Call_GetUsersUsernameFollowingTargetUser_756592;
   let scheme = call_756598.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756598.url(scheme.get, call_756598.host, call_756598.base,
-                         call_756598.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756598.makeUrl(scheme.get, call_756598.host, call_756598.base,
+                             call_756598.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756598, uri, valid, _)
 
 proc call*(call_756599: Call_GetUsersUsernameFollowingTargetUser_756592;
@@ -25732,7 +25630,8 @@ var getUsersUsernameFollowingTargetUser* = Call_GetUsersUsernameFollowingTargetU
     name: "getUsersUsernameFollowingTargetUser", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/following/{targetUser}",
     validator: validate_GetUsersUsernameFollowingTargetUser_756593, base: "/",
-    url: url_GetUsersUsernameFollowingTargetUser_756594, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameFollowingTargetUser_756594,
+    schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameGists_756602 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameGists_756604(protocol: Scheme; host: string; base: string;
@@ -25757,8 +25656,7 @@ proc url_GetUsersUsernameGists_756604(protocol: Scheme; host: string; base: stri
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameGists_756603(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List a users gists.
   ## 
   var section: JsonNode
@@ -25810,9 +25708,9 @@ proc call*(call_756608: Call_GetUsersUsernameGists_756602; path: JsonNode = nil;
   let scheme = call_756608.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756608.url(scheme.get, call_756608.host, call_756608.base,
-                         call_756608.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756608.makeUrl(scheme.get, call_756608.host, call_756608.base,
+                             call_756608.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756608, uri, valid, _)
 
 proc call*(call_756609: Call_GetUsersUsernameGists_756602; username: string;
@@ -25838,7 +25736,7 @@ proc call*(call_756609: Call_GetUsersUsernameGists_756602; username: string;
 var getUsersUsernameGists* = Call_GetUsersUsernameGists_756602(
     name: "getUsersUsernameGists", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/users/{username}/gists", validator: validate_GetUsersUsernameGists_756603,
-    base: "/", url: url_GetUsersUsernameGists_756604, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetUsersUsernameGists_756604, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameKeys_756613 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameKeys_756615(protocol: Scheme; host: string; base: string;
@@ -25863,8 +25761,7 @@ proc url_GetUsersUsernameKeys_756615(protocol: Scheme; host: string; base: strin
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameKeys_756614(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List public keys for a user.
   ## Lists the verified public keys for a user. This is accessible by anyone.
   ## 
@@ -25910,9 +25807,9 @@ proc call*(call_756618: Call_GetUsersUsernameKeys_756613; path: JsonNode = nil;
   let scheme = call_756618.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756618.url(scheme.get, call_756618.host, call_756618.base,
-                         call_756618.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756618.makeUrl(scheme.get, call_756618.host, call_756618.base,
+                             call_756618.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756618, uri, valid, _)
 
 proc call*(call_756619: Call_GetUsersUsernameKeys_756613; username: string;
@@ -25934,7 +25831,7 @@ proc call*(call_756619: Call_GetUsersUsernameKeys_756613; username: string;
 var getUsersUsernameKeys* = Call_GetUsersUsernameKeys_756613(
     name: "getUsersUsernameKeys", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/users/{username}/keys", validator: validate_GetUsersUsernameKeys_756614,
-    base: "/", url: url_GetUsersUsernameKeys_756615, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetUsersUsernameKeys_756615, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameOrgs_756622 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameOrgs_756624(protocol: Scheme; host: string; base: string;
@@ -25959,8 +25856,7 @@ proc url_GetUsersUsernameOrgs_756624(protocol: Scheme; host: string; base: strin
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameOrgs_756623(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List all public organizations for a user.
   ## 
   var section: JsonNode
@@ -26002,9 +25898,9 @@ proc call*(call_756627: Call_GetUsersUsernameOrgs_756622; path: JsonNode = nil;
   let scheme = call_756627.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756627.url(scheme.get, call_756627.host, call_756627.base,
-                         call_756627.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756627.makeUrl(scheme.get, call_756627.host, call_756627.base,
+                             call_756627.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756627, uri, valid, _)
 
 proc call*(call_756628: Call_GetUsersUsernameOrgs_756622; username: string;
@@ -26024,7 +25920,7 @@ proc call*(call_756628: Call_GetUsersUsernameOrgs_756622; username: string;
 var getUsersUsernameOrgs* = Call_GetUsersUsernameOrgs_756622(
     name: "getUsersUsernameOrgs", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/users/{username}/orgs", validator: validate_GetUsersUsernameOrgs_756623,
-    base: "/", url: url_GetUsersUsernameOrgs_756624, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetUsersUsernameOrgs_756624, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameReceivedEvents_756631 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameReceivedEvents_756633(protocol: Scheme; host: string;
@@ -26050,7 +25946,7 @@ proc url_GetUsersUsernameReceivedEvents_756633(protocol: Scheme; host: string;
 
 proc validate_GetUsersUsernameReceivedEvents_756632(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## These are events that you'll only see public events.
   ## 
   var section: JsonNode
@@ -26092,9 +25988,9 @@ proc call*(call_756636: Call_GetUsersUsernameReceivedEvents_756631;
   let scheme = call_756636.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756636.url(scheme.get, call_756636.host, call_756636.base,
-                         call_756636.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756636.makeUrl(scheme.get, call_756636.host, call_756636.base,
+                             call_756636.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756636, uri, valid, _)
 
 proc call*(call_756637: Call_GetUsersUsernameReceivedEvents_756631;
@@ -26115,7 +26011,7 @@ var getUsersUsernameReceivedEvents* = Call_GetUsersUsernameReceivedEvents_756631
     name: "getUsersUsernameReceivedEvents", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/received_events",
     validator: validate_GetUsersUsernameReceivedEvents_756632, base: "/",
-    url: url_GetUsersUsernameReceivedEvents_756633, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameReceivedEvents_756633, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameReceivedEventsPublic_756640 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameReceivedEventsPublic_756642(protocol: Scheme;
@@ -26141,7 +26037,7 @@ proc url_GetUsersUsernameReceivedEventsPublic_756642(protocol: Scheme;
 
 proc validate_GetUsersUsernameReceivedEventsPublic_756641(path: JsonNode;
     query: JsonNode; header: JsonNode; formData: JsonNode; body: JsonNode;
-    _: string = ""): JsonNode {.nosinks.} =
+    _: string = ""): JsonNode =
   ## List public events that a user has received
   ## 
   var section: JsonNode
@@ -26183,9 +26079,9 @@ proc call*(call_756645: Call_GetUsersUsernameReceivedEventsPublic_756640;
   let scheme = call_756645.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756645.url(scheme.get, call_756645.host, call_756645.base,
-                         call_756645.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756645.makeUrl(scheme.get, call_756645.host, call_756645.base,
+                             call_756645.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756645, uri, valid, _)
 
 proc call*(call_756646: Call_GetUsersUsernameReceivedEventsPublic_756640;
@@ -26206,7 +26102,8 @@ var getUsersUsernameReceivedEventsPublic* = Call_GetUsersUsernameReceivedEventsP
     name: "getUsersUsernameReceivedEventsPublic", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/received_events/public",
     validator: validate_GetUsersUsernameReceivedEventsPublic_756641, base: "/",
-    url: url_GetUsersUsernameReceivedEventsPublic_756642, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameReceivedEventsPublic_756642,
+    schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameRepos_756649 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameRepos_756651(protocol: Scheme; host: string; base: string;
@@ -26231,8 +26128,7 @@ proc url_GetUsersUsernameRepos_756651(protocol: Scheme; host: string; base: stri
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameRepos_756650(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List public repositories for the specified user.
   ## 
   var section: JsonNode
@@ -26281,9 +26177,9 @@ proc call*(call_756655: Call_GetUsersUsernameRepos_756649; path: JsonNode = nil;
   let scheme = call_756655.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756655.url(scheme.get, call_756655.host, call_756655.base,
-                         call_756655.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756655.makeUrl(scheme.get, call_756655.host, call_756655.base,
+                             call_756655.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756655, uri, valid, _)
 
 proc call*(call_756656: Call_GetUsersUsernameRepos_756649; username: string;
@@ -26306,7 +26202,7 @@ proc call*(call_756656: Call_GetUsersUsernameRepos_756649; username: string;
 var getUsersUsernameRepos* = Call_GetUsersUsernameRepos_756649(
     name: "getUsersUsernameRepos", meth: HttpMethod.HttpGet, host: "api.github.com",
     route: "/users/{username}/repos", validator: validate_GetUsersUsernameRepos_756650,
-    base: "/", url: url_GetUsersUsernameRepos_756651, schemes: {Scheme.Https})
+    base: "/", makeUrl: url_GetUsersUsernameRepos_756651, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameStarred_756660 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameStarred_756662(protocol: Scheme; host: string; base: string;
@@ -26332,8 +26228,7 @@ proc url_GetUsersUsernameStarred_756662(protocol: Scheme; host: string; base: st
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameStarred_756661(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List repositories being starred by a user.
   ## 
   var section: JsonNode
@@ -26375,9 +26270,9 @@ proc call*(call_756665: Call_GetUsersUsernameStarred_756660; path: JsonNode = ni
   let scheme = call_756665.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756665.url(scheme.get, call_756665.host, call_756665.base,
-                         call_756665.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756665.makeUrl(scheme.get, call_756665.host, call_756665.base,
+                             call_756665.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756665, uri, valid, _)
 
 proc call*(call_756666: Call_GetUsersUsernameStarred_756660; username: string;
@@ -26398,7 +26293,7 @@ var getUsersUsernameStarred* = Call_GetUsersUsernameStarred_756660(
     name: "getUsersUsernameStarred", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/starred",
     validator: validate_GetUsersUsernameStarred_756661, base: "/",
-    url: url_GetUsersUsernameStarred_756662, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameStarred_756662, schemes: {Scheme.Https})
 type
   Call_GetUsersUsernameSubscriptions_756669 = ref object of OpenApiRestCall_753573
 proc url_GetUsersUsernameSubscriptions_756671(protocol: Scheme; host: string;
@@ -26423,8 +26318,7 @@ proc url_GetUsersUsernameSubscriptions_756671(protocol: Scheme; host: string;
     result.path = base & hydrated.get
 
 proc validate_GetUsersUsernameSubscriptions_756670(path: JsonNode; query: JsonNode;
-    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode {.
-    nosinks.} =
+    header: JsonNode; formData: JsonNode; body: JsonNode; _: string = ""): JsonNode =
   ## List repositories being watched by a user.
   ## 
   var section: JsonNode
@@ -26466,9 +26360,9 @@ proc call*(call_756674: Call_GetUsersUsernameSubscriptions_756669;
   let scheme = call_756674.pickScheme
   if scheme.isNone:
     raise newException(IOError, "unable to find a supported scheme")
-  let uri = call_756674.url(scheme.get, call_756674.host, call_756674.base,
-                         call_756674.route, valid.getOrDefault("path"),
-                         valid.getOrDefault("query"))
+  let uri = call_756674.makeUrl(scheme.get, call_756674.host, call_756674.base,
+                             call_756674.route, valid.getOrDefault("path"),
+                             valid.getOrDefault("query"))
   result = hook(call_756674, uri, valid, _)
 
 proc call*(call_756675: Call_GetUsersUsernameSubscriptions_756669;
@@ -26489,7 +26383,7 @@ var getUsersUsernameSubscriptions* = Call_GetUsersUsernameSubscriptions_756669(
     name: "getUsersUsernameSubscriptions", meth: HttpMethod.HttpGet,
     host: "api.github.com", route: "/users/{username}/subscriptions",
     validator: validate_GetUsersUsernameSubscriptions_756670, base: "/",
-    url: url_GetUsersUsernameSubscriptions_756671, schemes: {Scheme.Https})
+    makeUrl: url_GetUsersUsernameSubscriptions_756671, schemes: {Scheme.Https})
 export
   rest
 
