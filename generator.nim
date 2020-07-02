@@ -41,5 +41,5 @@ render anApi:
 when not defined(ssl):
   {.error: "use ssl".}
 
-when NimMinor > 0:
+when NimMajor < 1:
   {.error: "use nim-1.0".}
