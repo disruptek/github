@@ -1,13 +1,13 @@
-import os
-import macros
-import strutils
-import httpcore
-import json
+import std/os
+import std/macros
+import std/strutils
+import std/httpcore
+import std/json
 
 import rest
 
-from openapi/spec import Scheme, toNimNode, hash
-import openapi/codegen
+from pkg/openapi/spec import Scheme, toNimNode, hash
+import pkg/openapi/codegen
 
 const
   OPENAPIIN* {.strdefine.} = os.getEnv("OPENAPIIN")
