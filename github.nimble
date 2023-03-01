@@ -1,4 +1,4 @@
-version = "2.0.5"
+version = "3.0.0"
 author = "disruptek"
 description = "github api"
 license = "MIT"
